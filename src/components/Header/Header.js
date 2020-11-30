@@ -30,7 +30,7 @@ export default function Header() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            E-Charger Emulator Test Page
+            E-Charger Emulator Control Interface
           </Typography>
         </Toolbar>
       </AppBar>
