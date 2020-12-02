@@ -14,15 +14,14 @@ class App extends Component{
     super(props)
     this.state = {
       p1 :
-        {id: 1, selected : false, port : {}, role : "NA",onClickHandler:this.selectCom1,rawData:""},
+        {id: 1, selected : false, port : {},onClickHandler:this.selectCom1},
       p2 :
-        {id: 2, selected : false, port : {}, role : "NA",onClickHandler:this.selectCom2,rawData:""},
+        {id: 2, selected : false, port : {},onClickHandler:this.selectCom2},
       
     };
 
     this.selectCom1 = this.selectCom1.bind(this)
     this.selectCom2 = this.selectCom2.bind(this)
-    this.portReader = {}
   }
   prepareSlider(){
     return(
@@ -65,56 +64,28 @@ class App extends Component{
       case 1:
         if(!this.state.p1.selected){
           const p1 = await navigator.serial.requestPort()
+          
           this.setState(
             {
               p1 : {id: this.state.p1.id, selected : true, port : p1},
               p2 : this.state.p2
             }
           )
-    
-          await p1.open({ baudRate: 9600});
-          this.portReader = p1.readable.getReader();
-          while (true) {
-            const { value, done } = await this.portReader.read();
-            if (done) {
-              break;
-            }
-            console.log("VALUE ",value)
-            this.setState(
-              {
-                p1 : {id: this.state.p1.id, selected : true,port:this.state.p1.port ,rawData: this.state.p1.rawData+value},
-                p2 : this.state.p2
-              }
-            )
-          }
+
         }
         break;
 
       case 2:
         if(!this.state.p2.selected){
           const p2 = await navigator.serial.requestPort()
+          
           this.setState(
             {
               p1 : this.state.p1,
               p2 : {id: this.state.p2.id, selected : true, port : p2}
             }
           )
-    
-          await p2.open({ baudRate: 9600});
-          this.portReader = p2.readable.getReader();
-          while (true) {
-            const { value, done } = await this.portReader.read();
-            if (done) {
-              break;
-            }
-            console.log("VALUE ",value)
-            this.setState(
-              {
-                p1 : this.state.p1,
-                p2 : {id: this.state.p2.id, selected : true,port:this.state.p2.port ,rawData: this.state.p2.rawData+value}
-              }
-            )
-          }
+
         }
         break;
         default:
@@ -137,20 +108,12 @@ class App extends Component{
   }
 
   prepareComPortSelectButtons(){
-    if(!this.state.p2.selected)
     return(
       <ButtonGroup disableElevation variant="contained" color="secondary">
-        <Button onClick={this.selectCom1} key="c1">COM 1</Button>
-        <Button onClick={this.selectCom2} key="c2">COM 2</Button>
+        {this.state.p1.selected === false ? <Button onClick={this.selectCom1} key="c1">COM 1</Button> : null}
+        {this.state.p2.selected === false ? <Button onClick={this.selectCom2} key="c2">COM 2</Button> : null}
       </ButtonGroup>
       )
-    else{
-      return(
-        <ButtonGroup disableElevation variant="contained" color="secondary">
-          <Button onClick={this.selectCom1} key="c1">COM 1</Button>
-        </ButtonGroup>
-        )
-    }
   }
   render(){
 
@@ -170,20 +133,15 @@ class App extends Component{
         </Grid>
         <Grid item xs={6}>
           <Paper>
-            <DeviceState comportName="COM1"/>
+            {this.state.p1.selected === true ? <DeviceState comportName="COM1" port={this.state.p1}/> : null}
           </Paper>
         </Grid>
         <Grid item xs={6}>
           <Paper>
-            <DeviceState comportName="COM2"/>
+            {this.state.p2.selected === true ? <DeviceState comportName="COM2" port={this.state.p2}/> : null}
           </Paper>
         </Grid>
-        <Grid item xs={12}>
-          {this.state.p1.rawData}
-        </Grid>
-        <Grid item xs={12}>
-          {this.state.p2.rawData}
-        </Grid>
+        
       </Grid>
     </div>
   );

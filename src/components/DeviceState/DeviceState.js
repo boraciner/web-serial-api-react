@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 
 
 class DeviceState extends Component{
-
+    
     prepareTimeline(){
         return(
         <div>
@@ -49,18 +49,63 @@ class DeviceState extends Component{
         </div>
         )
     }
+
+    componentDidMount(){
+        this.OpenReadComPort();
+    }
+
+    async OpenReadComPort(){
+        console.log("OpenReadComPort",this.props.comportName)
+        console.log("Port..",this.props.port)
+        
+        const p_Port = this.props.port
+
+        await p_Port.port.open({ baudRate: 9600});
+        this.portReader = p_Port.port.readable.getReader();
+        while (true) {
+        const { value, done } = await this.portReader.read();
+        if (done) {
+            break;
+        }
+        console.log("VALUE ",value)
+
+        this.rawData += new TextDecoder("utf-8").decode(value)
+        console.log("rawData ",this.rawData)
+        this.setState(
+           { 
+               printOutCom : this.rawData
+           }
+        )
+        }
+    }
+
+
     constructor(props){
         super(props)
         console.log("Com name : ",props.comportName)
+        console.log("Is it selected ? ",props.port.selected)
+        
         this.theme = responsiveFontSizes(createMuiTheme());
+
+        this.portReader = {}
+        this.rawData = ""
+
+        this.state = {
+            printOutCom : ""
+          };
+
+        
     }
     render(){
         return (
             <div>
                 {this.prepareTimeline()}
+                <hr/>
+                <h3>{this.state.printOutCom}</h3>
             </div>
             );
     }
 }
+
 
 export default DeviceState
