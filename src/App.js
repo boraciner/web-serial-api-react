@@ -7,7 +7,6 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import CalculatedChart from './components/CalculatedChart/CalculatedChart'
 
 class App extends Component{
 
@@ -56,48 +55,85 @@ class App extends Component{
       </Grid>
     ) 
   }
-  async selectCom1(){
+  
+
+
+  async AskUserForComport(slotId){
     try {
-      const p1 = await navigator.serial.requestPort()
-      this.setState(
-        {
-          p1 : {id: this.state.p1.id, selected : true, port : p1}
+      
+      switch(slotId){
+      case 1:
+        if(!this.state.p1.selected){
+          const p1 = await navigator.serial.requestPort()
+          this.setState(
+            {
+              p1 : {id: this.state.p1.id, selected : true, port : p1},
+              p2 : this.state.p2
+            }
+          )
+    
+          await p1.open({ baudRate: 9600});
+          this.portReader = p1.readable.getReader();
+          while (true) {
+            const { value, done } = await this.portReader.read();
+            if (done) {
+              break;
+            }
+            console.log("VALUE ",value)
+            this.setState(
+              {
+                p1 : {id: this.state.p1.id, selected : true,port:this.state.p1.port ,rawData: this.state.p1.rawData+value},
+                p2 : this.state.p2
+              }
+            )
+          }
         }
-      )
-    } catch (err) {
-      console.log("An error was caught: ", err);
+        break;
+
+      case 2:
+        if(!this.state.p2.selected){
+          const p2 = await navigator.serial.requestPort()
+          this.setState(
+            {
+              p1 : this.state.p1,
+              p2 : {id: this.state.p2.id, selected : true, port : p2}
+            }
+          )
+    
+          await p2.open({ baudRate: 9600});
+          this.portReader = p2.readable.getReader();
+          while (true) {
+            const { value, done } = await this.portReader.read();
+            if (done) {
+              break;
+            }
+            console.log("VALUE ",value)
+            this.setState(
+              {
+                p1 : this.state.p1,
+                p2 : {id: this.state.p2.id, selected : true,port:this.state.p2.port ,rawData: this.state.p2.rawData+value}
+              }
+            )
+          }
+        }
+        break;
+        default:
+          console.error("Default switch-case")
+          break;
     }
+  } catch (err) {
+    console.log("An error was caught: ", err);
+  }
+  }
+ 
+
+  async selectCom1(){
+      this.AskUserForComport(1)   
   }
 
 
- 
   async selectCom2(){
-    try {
-      const p2 = await navigator.serial.requestPort()
-      this.setState(
-        {
-          p2 : {id: this.state.p2.id, selected : true, port : p2}
-        }
-      )
-
-      await p2.open({ baudRate: 9600});
-      this.portReader = p2.readable.getReader();
-      while (true) {
-        const { value, done } = await this.portReader.read();
-        if (done) {
-          break;
-        }
-        console.log("VALUE ",value)
-        this.setState(
-          {
-            p2 : {id: this.state.p2.id, selected : true,port:this.state.p2.port ,rawData: this.state.p2.rawData+value}
-          }
-        )
-      }
-
-    } catch (err) {
-      console.log("An error was caught: ", err);
-    }
+      this.AskUserForComport(2)   
   }
 
   prepareComPortSelectButtons(){
@@ -141,6 +177,9 @@ class App extends Component{
           <Paper>
             <DeviceState comportName="COM2"/>
           </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          {this.state.p1.rawData}
         </Grid>
         <Grid item xs={12}>
           {this.state.p2.rawData}
