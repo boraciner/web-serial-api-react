@@ -3,7 +3,6 @@ import Header from "./components/Header/Header"
 import DeviceState from './components/DeviceState/DeviceState'
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 

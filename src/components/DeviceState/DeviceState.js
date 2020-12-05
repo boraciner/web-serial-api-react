@@ -12,8 +12,16 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
+import EvStationIcon from '@material-ui/icons/EvStation';
+import DirectionsCarIcon from '@material-ui/icons/DirectionsCar';
+import lightGreen from "@material-ui/core/colors/lightGreen";
+
+
+
+
 
 class DeviceState extends Component{
+    
     
     preparePEVRelatedButtons(){
         return(
@@ -22,13 +30,21 @@ class DeviceState extends Component{
             justify="center"
             alignItems="center">
             <Grid item xs={6}>
-                <ButtonGroup  >
+                <ButtonGroup  style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
                 <Button color="primary" aria-label="outlined primary button group">Start</Button>
                 <Button color="secondary" aria-label="outlined secondary button group">Stop</Button>
                 </ButtonGroup>
             </Grid>
             <Grid item xs={6}>
-                <FormControlLabel
+                <FormControlLabel style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                        }}
                 control={<Switch name="checkedA" />}
                 label="Auto Run"
                 />
@@ -37,9 +53,9 @@ class DeviceState extends Component{
         ) 
       }
 
-    prepareTimeLineItem(content,isSecondary = false){
+    prepareTimeLineItem(content,isSecondary = false,myKey){
         return(
-            <TimelineItem>
+            <TimelineItem key={myKey}> 
                 <TimelineSeparator>
                 <TimelineDot color={isSecondary ? "secondary" : "primary"} />
                 <TimelineConnector />
@@ -49,73 +65,69 @@ class DeviceState extends Component{
         )
     }
 
+    
+
+    initializePEVStrings(){
+        this.pevStrings = [
+            {details : "PLC - PIB image reading completed OK.",found : false},
+            {details : "CM_SLAC_PARAM.REQ sent",found : false},
+            {details : "CM_SLAC_PARAM.CNF received",found : false},
+            {details : "CM_START_ATTEN_CHAR.IND sent",found : false},
+            {details : "CM_START_ATTEN_CHAR.IND sent",found : false},
+            {details : "CM_START_ATTEN_CHAR.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_MNBC_SOUND.IND sent",found : false},
+            {details : "CM_ATTEN_CHAR.IND received",found : false},
+            {details : "CM_ATTEN_CHAR.RSP sent",found : false},
+            {details : "CM_VALIDATE.REQ sent",found : false},
+            {details : "CM_SLAC_MATCH.CNF received. -Charger Success-",found : false},	
+        ]
+    }
+
     preparePEVTimeLine(){
         return(
             <div>
             <ThemeProvider theme={this.theme}>
-            <Typography variant="h5">Role : {this.state.role}</Typography>
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+            <DirectionsCarIcon style={{ color: 'green' , fontSize: '60px'} }/>
+            </div>
             </ThemeProvider>
             <Timeline align="alternate">
-            {this.prepareTimeLineItem("CM_SLAC_PARAM.REQ sent")}
-            {this.prepareTimeLineItem("CM_SLAC_PARAM.CNF received")}
-            {this.prepareTimeLineItem("CM_START_ATTEN_CHAR.IND sent",true)}
-            {this.prepareTimeLineItem("CM_START_ATTEN_CHAR.IND sent")}
-            {this.prepareTimeLineItem("CM_START_ATTEN_CHAR.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
+
+            {
+                this.pevStrings.map((value,key)=>(
+                   this.prepareTimeLineItem(value.details,value.found,key)                      
+                ))
+            }
+
               
             </Timeline>
             </div>
             )
     }
-
-
-
-    
     prepareEVSETimeLine(){
         return(
             <div>
             <ThemeProvider theme={this.theme}>
-            <Typography variant="h5">Role : {this.state.role}</Typography>
+            <EvStationIcon/>
             </ThemeProvider>
-            <Timeline align="alternate">
-            {this.prepareTimeLineItem("CM_SLAC_PARAM.REQ sent")}
-            {this.prepareTimeLineItem("CM_SLAC_PARAM.CNF received")}
-            {this.prepareTimeLineItem("CM_START_ATTEN_CHAR.IND sent",true)}
-            {this.prepareTimeLineItem("CM_START_ATTEN_CHAR.IND sent")}
-            {this.prepareTimeLineItem("CM_START_ATTEN_CHAR.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-            {this.prepareTimeLineItem("CM_MNBC_SOUND.IND sent")}
-              
-            </Timeline>
             </div>
             )
     }
 
-
-    prepareTimeline(){
-        if(this.state.role === "PEV")
-            this.preparePEVTimeLine()
-        else if(this.state.role === "EVSE")
-            this.prepareEVSETimeLine()
-        else 
-            return(null) 
-    }
-
+  
     componentDidMount(){
         this.OpenReadComPort();
     }
@@ -127,15 +139,44 @@ class DeviceState extends Component{
             case "ROLE:PEV":
                 this.role = "PEV";
                 clearInterval(this.queryInterval);
-                this.setState({  role : this.role })
+                this.setState({  printOutCom : this.printOutCom,
+                                    toggleToRefresh : this.toggleToRefresh,
+                                    role : this.role  
+                                })
+
+                
+
                 break;
             case "ROLE:EVSE":
                 this.role = "EVSE";
                 clearInterval(this.queryInterval);
-                this.setState({  role : this.role })
+                this.setState({  printOutCom : this.printOutCom,
+                                    toggleToRefresh : this.toggleToRefresh,
+                                    role : this.role  })
                 break;
             default:
-                console.warn("Unhandled Splitted Command : ",sCommand)       
+                let nowFound = false;
+                for(let i=0;i<this.pevStrings.length;i++){
+                    console.log("Compare ",sCommand, " with ",this.pevStrings[i].details)
+                    if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
+                        this.pevStrings[i].found = true
+                        nowFound = true
+                        break;
+                    }
+                }
+
+                if(nowFound === true){
+                    console.warn("OKKKKKKKK")
+
+                    this.setState({  
+                        printOutCom : this.printOutCom,
+                        toggleToRefresh : true,
+                        role : this.role  
+                    })
+
+                }
+
+                       
         }
     }
 
@@ -202,15 +243,18 @@ class DeviceState extends Component{
         this.rawData = ""
         this.role = ""
         this.state = {
-            printOutCom : ""
+            printOutCom : "",
+            toggleToRefresh : false,
+            role : ""
           };
 
         this.queryInterval = {}
-        this.setState({  role : "" })
+        this.initializePEVStrings()
     }
     render(){
         return (
             <div>
+
                 <div>
                     {this.state.role === "PEV" ? this.preparePEVRelatedButtons() : null }
                 </div>
@@ -218,7 +262,7 @@ class DeviceState extends Component{
                     this.state.role === "PEV" ?
                     this.preparePEVTimeLine() : 
                         this.state.role === "EVSE" ? 
-                        this.preparePEVTimeLine() : null  
+                        this.prepareEVSETimeLine() : null  
                 }
                 
                 <h3>{this.state.printOutCom}</h3>
