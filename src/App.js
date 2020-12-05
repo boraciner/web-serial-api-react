@@ -3,8 +3,7 @@ import Header from "./components/Header/Header"
 import DeviceState from './components/DeviceState/DeviceState'
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
+
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 
@@ -23,38 +22,23 @@ class App extends Component{
     this.selectCom1 = this.selectCom1.bind(this)
     this.selectCom2 = this.selectCom2.bind(this)
   }
-  prepareSlider(){
-    return(
-      <Grid container spacing={3} 
-        direction="row"
-        justify="flex-end"
-        alignItems="center">
-        <Grid item xs={3}>
-        <FormControlLabel
-          control={<Switch name="checkedA" />}
-          label="Auto Run"
-        />
-        </Grid>
-      </Grid>
-    ) 
-  }
-
-  prepareStartStopButtons(){
-    return(
-      <Grid container spacing={3} 
-        direction="row"
-        justify="center"
-        alignItems="center">
-        <Grid item xs={3}>
-        <ButtonGroup  >
-          <Button color="primary" aria-label="outlined primary button group">Start</Button>
-          <Button color="secondary" aria-label="outlined secondary button group">Stop</Button>
-        </ButtonGroup>
-        </Grid>
-      </Grid>
-    ) 
-  }
   
+
+  
+  
+  async componentDidMount(){
+    console.log("list of serial ports the website has been granted access to previously",navigator.serial.getPorts())
+    const portList = await navigator.serial.getPorts()
+    
+    if(portList.length === 2){
+      this.setState(
+        {
+          p1 : {id: portList[0].id, selected : true, port : portList[0]},
+          p2 : {id: portList[1].id, selected : false, port : portList[1]},
+        }
+      )
+    }
+  }
 
 
   async AskUserForComport(slotId){
@@ -63,6 +47,7 @@ class App extends Component{
       switch(slotId){
       case 1:
         if(!this.state.p1.selected){
+          console.log("list of serial ports the website has been granted access to previously",navigator.serial.getPorts())
           const p1 = await navigator.serial.requestPort()
           
           this.setState(
@@ -110,8 +95,8 @@ class App extends Component{
   prepareComPortSelectButtons(){
     return(
       <ButtonGroup disableElevation variant="contained" color="secondary">
-        {this.state.p1.selected === false ? <Button onClick={this.selectCom1} key="c1">COM 1</Button> : null}
-        {this.state.p2.selected === false ? <Button onClick={this.selectCom2} key="c2">COM 2</Button> : null}
+        {this.state.p1.selected === false ? <Button onClick={this.selectCom1} key="c1">COM</Button> : null}
+        {this.state.p2.selected === false ? <Button onClick={this.selectCom2} key="c2">COM</Button> : null}
       </ButtonGroup>
       )
   }
@@ -125,20 +110,14 @@ class App extends Component{
         <Grid item xs={12}>
           {this.prepareComPortSelectButtons()}
         </Grid>
-        <Grid item xs={12}>
-          {this.prepareSlider()}
-        </Grid>
-        <Grid item xs={12}>
-        {this.prepareStartStopButtons()}
-        </Grid>
         <Grid item xs={6}>
           <Paper>
-            {this.state.p1.selected === true ? <DeviceState comportName="COM1" port={this.state.p1}/> : null}
+            {this.state.p1.selected === true ? <DeviceState port={this.state.p1}/> : null}
           </Paper>
         </Grid>
         <Grid item xs={6}>
           <Paper>
-            {this.state.p2.selected === true ? <DeviceState comportName="COM2" port={this.state.p2}/> : null}
+            {this.state.p2.selected === true ? <DeviceState port={this.state.p2}/> : null}
           </Paper>
         </Grid>
         
