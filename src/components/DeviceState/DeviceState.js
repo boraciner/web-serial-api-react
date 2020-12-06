@@ -6,7 +6,6 @@ import TimelineConnector from '@material-ui/lab/TimelineConnector';
 import TimelineContent from '@material-ui/lab/TimelineContent';
 import TimelineDot from '@material-ui/lab/TimelineDot';
 import { createMuiTheme, responsiveFontSizes, ThemeProvider } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -14,15 +13,23 @@ import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
 import EvStationIcon from '@material-ui/icons/EvStation';
 import DirectionsCarIcon from '@material-ui/icons/DirectionsCar';
-import lightGreen from "@material-ui/core/colors/lightGreen";
 
 
 
 
 
 class DeviceState extends Component{
+    pevSendStartCommand(){
+        const data = new Uint8Array([32]); // space
+            this.portWriter.write(data).then(res=>{
+            });
+    }
     
-    
+    pevSendStopCommand(){
+        const data = new Uint8Array([100]); // d
+        this.portWriter.write(data).then(res=>{
+        });
+    }
     preparePEVRelatedButtons(){
         return(
           <Grid container 
@@ -35,8 +42,8 @@ class DeviceState extends Component{
                 alignItems: 'center',
                 justifyContent: 'center',
             }}>
-                <Button color="primary" aria-label="outlined primary button group">Start</Button>
-                <Button color="secondary" aria-label="outlined secondary button group">Stop</Button>
+                <Button color="primary"  onClick={this.pevSendStartCommand} aria-label="outlined primary button group">Start</Button>
+                <Button color="secondary"  onClick={this.pevSendStopCommand} aria-label="outlined secondary button group">Stop</Button>
                 </ButtonGroup>
             </Grid>
             <Grid item xs={6}>
@@ -250,6 +257,8 @@ class DeviceState extends Component{
 
         this.queryInterval = {}
         this.initializePEVStrings()
+        this.pevSendStartCommand = this.pevSendStartCommand.bind(this)
+        this.pevSendStopCommand = this.pevSendStopCommand.bind(this)
     }
     render(){
         return (
