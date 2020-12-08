@@ -21,7 +21,7 @@ import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import SettingsInputHdmiIcon from '@material-ui/icons/SettingsInputHdmi';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import EmailIcon from '@material-ui/icons/Email';
-
+import Typography from '@material-ui/core/Typography';
 
 class DeviceState extends Component{
     pevSendStartCommand(){
@@ -142,7 +142,12 @@ class DeviceState extends Component{
                 </TimelineDot>
                 <TimelineConnector />
                 </TimelineSeparator>
-                <TimelineContent>{content}</TimelineContent>
+                <TimelineContent>
+                <Typography variant="h8" >
+                        {content}
+                </Typography>
+                    
+                </TimelineContent>
             </TimelineItem>
         )
     }

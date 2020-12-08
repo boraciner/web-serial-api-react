@@ -6,6 +6,14 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 
+var sectionStyle = {
+  width: "100%",
+  height: "100%",
+  background: "rgb(2,0,36)",
+  background: "linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(105,255,90,1) 12%, rgba(19,66,0,1) 100%)",
+};
+
+
 class App extends Component{
 
   constructor(props){
@@ -109,16 +117,16 @@ class App extends Component{
   render(){
 
   return (
-    <div>
+    <div style={ sectionStyle } >
       <Header/>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={0}  >
         <Grid item xs={12}>
           {this.prepareComPortSelectButtons()}
         </Grid>
         <Grid item xs={12}>
-          <Paper>
-            {this.state.p1.selected === true ? <DeviceState port={this.state.p1}/> : null}
+          <Paper style={{backgroundColor: 'rgba(255,255,255,.1)'}}>
+            {this.state.p1.selected === true ? <DeviceState port={this.state.p1}/ > : null}
           </Paper>
         </Grid>
       </Grid>
