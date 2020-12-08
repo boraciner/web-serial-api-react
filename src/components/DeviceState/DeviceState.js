@@ -13,9 +13,14 @@ import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
 import EvStationIcon from '@material-ui/icons/EvStation';
 import DirectionsCarIcon from '@material-ui/icons/DirectionsCar';
-
-
-
+import FastfoodIcon from '@material-ui/icons/Fastfood';
+import FingerprintIcon from '@material-ui/icons/Fingerprint';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
+import SettingsInputHdmiIcon from '@material-ui/icons/SettingsInputHdmi';
+import MailOutlineIcon from '@material-ui/icons/MailOutline';
+import EmailIcon from '@material-ui/icons/Email';
 
 
 class DeviceState extends Component{
@@ -67,11 +72,74 @@ class DeviceState extends Component{
         ) 
       }
 
+    getRelatedIcon(myKey){
+        switch(myKey){
+        case 0:
+            return(<FingerprintIcon/>)
+        case 1:
+            return(<ArrowForwardIcon/>)
+        case 2:
+            return(<ArrowBackIcon/>)
+        case 3:
+            return(<ArrowForwardIcon/>)
+        case 4:
+            return(<ArrowForwardIcon/>)
+        case 5:
+            return(<ArrowForwardIcon/>)
+        case 6:
+            return(<ArrowForwardIcon/>)
+        case 7:
+            return(<ArrowForwardIcon/>)
+        case 8:
+            return(<ArrowForwardIcon/>)
+        case 9:
+            return(<ArrowForwardIcon/>)
+        case 10:
+            return(<ArrowForwardIcon/>)
+        case 11:
+            return(<ArrowForwardIcon/>)
+        case 12:
+            return(<ArrowForwardIcon/>)
+        case 13:
+            return(<ArrowForwardIcon/>)
+        case 14:
+            return(<ArrowForwardIcon/>)
+        case 15:
+            return(<ArrowForwardIcon/>)
+        case 16:
+            return(<ArrowBackIcon/>)
+        case 17:
+            return(<ArrowForwardIcon/>)
+        case 18:
+            return(<ArrowForwardIcon/>)
+        case 19:
+            return(<ArrowBackIcon/>)
+        case 20:
+            return(<ArrowBackIcon/>)
+        case 21:
+            return(<ArrowBackIcon/>)
+        case 22:
+            return(<SaveAltIcon/>) //New keys set
+        case 23:
+            return(<SettingsInputHdmiIcon/>) //Link Measurement:
+        case 24:
+            return(<MailOutlineIcon/>) // Sending IPv6.
+        case 25:
+            return(<EmailIcon/>) // IPv6 Message is received   
+        default:
+            return(<FastfoodIcon/>)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+        }
+        
+    }
+
     prepareTimeLineItem(content,isSecondary = false,myKey){
         return(
             <TimelineItem key={myKey}> 
                 <TimelineSeparator>
-                <TimelineDot color={isSecondary ? "secondary" : "primary"} />
+                <TimelineDot color={isSecondary ? "secondary" : "primary"}>
+                    {this.getRelatedIcon(myKey)}
+                </TimelineDot>
                 <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent>{content}</TimelineContent>
@@ -102,7 +170,6 @@ class DeviceState extends Component{
             {details : "CM_ATTEN_CHAR.IND received",display : "CM_ATTEN_CHAR.IND received",found : false},
             {details : "CM_ATTEN_CHAR.RSP sent",display : "CM_ATTEN_CHAR.RSP sent",found : false},
             {details : "CM_VALIDATE.REQ sent",display : "CM_VALIDATE.REQ sent",found : false},
-            {details : "CM_SLAC_MATCH.CNF received. -Charger Not Ready-",display : "CM_SLAC_MATCH.CNF received. -Charger Not Ready-",found : false},	
             {details : "CM_SLAC_MATCH.CNF received. -Charger Ready-",display : "CM_SLAC_MATCH.CNF received. -Charger Ready-",found : false},	
             {details : "CM_SLAC_MATCH.CNF received. -Charger Success-",display : "CM_SLAC_MATCH.CNF received. -Charger Success-",found : false},	
             {details : "CM_SET_KEY.CNF received",display : "CM_SET_KEY.CNF received",found : false},	
@@ -180,11 +247,11 @@ class DeviceState extends Component{
                     for(let i=0;i<this.pevStrings.length;i++){
                         //console.log("Compare ",sCommand, " with ",this.pevStrings[i].details)
                         if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
-                            if(sCommand.includes(this.pevStrings[24].details))//Link Measurement
+                            if(sCommand.includes(this.pevStrings[23].details))//Link Measurement
                             {
                                 let measurementValue = sCommand.split(':')
                                 if(measurementValue.length>1){
-                                    this.pevStrings[24].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
+                                    this.pevStrings[23].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
                                 }
                             }
                            
@@ -282,6 +349,7 @@ class DeviceState extends Component{
         this.initializePEVStrings()
         this.pevSendStartCommand = this.pevSendStartCommand.bind(this)
         this.pevSendStopCommand = this.pevSendStopCommand.bind(this)
+        this.getRelatedIcon = this.getRelatedIcon.bind(this)
         this.linkMeasurements = []
     }
     render(){

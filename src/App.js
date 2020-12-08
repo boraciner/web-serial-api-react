@@ -36,6 +36,13 @@ class App extends Component{
           p2 : {id: portList[1].id, selected : false, port : portList[1]},
         }
       )
+    }else if(portList.length === 1){
+      this.setState(
+        {
+          p1 : {id: portList[0].id, selected : true, port : portList[0]},
+          p2 : this.state.p1,
+        }
+      )
     }
   }
 
@@ -95,7 +102,7 @@ class App extends Component{
     return(
       <ButtonGroup disableElevation variant="contained" color="secondary">
         {this.state.p1.selected === false ? <Button onClick={this.selectCom1} key="c1">COM</Button> : null}
-        {this.state.p2.selected === false ? <Button onClick={this.selectCom2} key="c2">COM</Button> : null}
+        {/*this.state.p2.selected === false ? <Button onClick={this.selectCom2} key="c2">COM</Button> : null*/}
       </ButtonGroup>
       )
   }
@@ -109,17 +116,11 @@ class App extends Component{
         <Grid item xs={12}>
           {this.prepareComPortSelectButtons()}
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12}>
           <Paper>
             {this.state.p1.selected === true ? <DeviceState port={this.state.p1}/> : null}
           </Paper>
         </Grid>
-        <Grid item xs={6}>
-          <Paper>
-            {this.state.p2.selected === true ? <DeviceState port={this.state.p2}/> : null}
-          </Paper>
-        </Grid>
-        
       </Grid>
     </div>
   );
