@@ -29,7 +29,10 @@ class DeviceState extends Component{
             this.portWriter.write(data).then(res=>{
             });
     }
-    
+    handleContToggleSwitch(event){
+
+    }
+
     pevSendStopCommand(){
         const data = new Uint8Array([100]); // d
         this.portWriter.write(data).then(res=>{
@@ -39,7 +42,8 @@ class DeviceState extends Component{
         this.setState({  
             printOutCom : this.printOutCom,
             toggleToRefresh : true,
-            role : this.role  
+            role : this.role,
+            checked : this.state.checked  
         })
     }
     preparePEVRelatedButtons(){
@@ -47,15 +51,19 @@ class DeviceState extends Component{
           <Grid container 
             direction="row"
             justify="center"
-            alignItems="center">
-            <Grid item xs={6}>
-                <ButtonGroup  style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}>
-                <Button color="primary"  onClick={this.pevSendStartCommand} aria-label="outlined primary button group">Start</Button>
-                <Button color="secondary"  onClick={this.pevSendStopCommand} aria-label="outlined secondary button group">Stop</Button>
+            alignItems="center"
+            
+            style={{
+               backgroundColor : "white"
+            }}
+            >
+            <Grid item xs={3}>
+                Test Action :
+            </Grid>
+            <Grid item xs={3}>
+                <ButtonGroup  variant="contained" color="primary" aria-label="contained primary button group">
+                <Button color="primary"  onClick={this.pevSendStartCommand}  >Start</Button>
+                <Button color="secondary"  onClick={this.pevSendStopCommand} >Stop</Button>
                 </ButtonGroup>
             </Grid>
             <Grid item xs={6}>
@@ -64,14 +72,20 @@ class DeviceState extends Component{
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                         }}
-                control={<Switch name="checkedA" />}
-                label="Auto Run"
+                control={<Switch name="checkedA" onClick={() => {  this.setState({checked: !this.state.checked,
+                                                                                        printOutCom : this.printOutCom,
+                                                                                        toggleToRefresh : this.toggleToRefresh,
+                                                                                        role : this.role  
+                                                                                        }) }}
+                checked={this.state.checked ? true : false}/>
+            }
+                label="Continuous Test"
                 />
             </Grid>
           </Grid>
         ) 
       }
-
+      
     getRelatedIcon(myKey){
         switch(myKey){
         case 0:
@@ -135,18 +149,20 @@ class DeviceState extends Component{
 
     prepareTimeLineItem(content,isSecondary = false,myKey){
         return(
-            <TimelineItem key={myKey}> 
+            <TimelineItem key={myKey} > 
                 <TimelineSeparator>
-                <TimelineDot color={isSecondary ? "secondary" : "primary"}>
+                <TimelineDot color={isSecondary ? "secondary" : "primary"} style={{display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center"}}>
                     {this.getRelatedIcon(myKey)}
                 </TimelineDot>
                 <TimelineConnector />
                 </TimelineSeparator>
-                <TimelineContent>
-                <Typography variant="h8" >
-                        {content}
-                </Typography>
-                    
+                <TimelineContent  style={{display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "start",
+                    paddingTop: "20px",}}>
+                    {content}
                 </TimelineContent>
             </TimelineItem>
         )
@@ -175,8 +191,8 @@ class DeviceState extends Component{
             {details : "CM_ATTEN_CHAR.IND received",display : "CM_ATTEN_CHAR.IND received",found : false},
             {details : "CM_ATTEN_CHAR.RSP sent",display : "CM_ATTEN_CHAR.RSP sent",found : false},
             {details : "CM_VALIDATE.REQ sent",display : "CM_VALIDATE.REQ sent",found : false},
-            {details : "CM_SLAC_MATCH.CNF received. -Charger Ready-",display : "CM_SLAC_MATCH.CNF received. -Charger Ready-",found : false},	
-            {details : "CM_SLAC_MATCH.CNF received. -Charger Success-",display : "CM_SLAC_MATCH.CNF received. -Charger Success-",found : false},	
+            {details : "CM_VALIDATE.CNF received. -Charger Ready-",display : "CM_VALIDATE.CNF received. -Charger Ready-",found : false},	
+            {details : "CM_VALIDATE.CNF received. -Charger Success-",display : "CM_VALIDATE.CNF received. -Charger Success-",found : false},	
             {details : "CM_SET_KEY.CNF received",display : "CM_SET_KEY.CNF received",found : false},	
             {details : "New keys set",display : "New keys set",found : false},	
             {details : "Link Measurement:",display : "Link Measurement:",found : false},	
@@ -200,16 +216,17 @@ class DeviceState extends Component{
             <DirectionsCarIcon style={{ color: 'green' , fontSize: '60px'} }/>
             </div>
             </ThemeProvider>
-            <Timeline align="alternate">
-
+            <ThemeProvider theme={this.theme}>
+            <Typography variant="h2">
+            <Timeline align="alternate" >
             {
                 this.pevStrings.map((value,key)=>(
                    this.prepareTimeLineItem(value.display,value.found,key)                      
                 ))
             }
-
-              
             </Timeline>
+            </Typography>  
+            </ThemeProvider>
             </div>
             )
     }
@@ -237,7 +254,8 @@ class DeviceState extends Component{
                     clearInterval(this.queryInterval);
                     this.setState({  printOutCom : this.printOutCom,
                                         toggleToRefresh : this.toggleToRefresh,
-                                        role : this.role  
+                                        role : this.role  ,
+                                        checked : this.state.checked  
                                     })
             }
             else if(sCommand.includes("ROLE:EVSE"))
@@ -246,7 +264,8 @@ class DeviceState extends Component{
                     clearInterval(this.queryInterval);
                     this.setState({  printOutCom : this.printOutCom,
                                         toggleToRefresh : this.toggleToRefresh,
-                                        role : this.role  })
+                                        role : this.role ,
+                                        checked : this.state.checked   })
             }else{
                     let nowFound = false;
                     for(let i=0;i<this.pevStrings.length;i++){
@@ -262,6 +281,13 @@ class DeviceState extends Component{
                            
                             this.pevStrings[i].found = true
                             nowFound = true
+                            if(i === 25 && this.state.checked === true)// IPv6 Message
+                            {
+                                setTimeout(()=>{this.pevSendStopCommand()},15000);
+                            }else if(i === 0 && this.state.checked === true)// IPv6 Message
+                            {
+                                setTimeout(()=>{this.pevSendStartCommand()},5000);
+                            }
                             break;
                         }
                     }
@@ -272,7 +298,8 @@ class DeviceState extends Component{
                         this.setState({  
                             printOutCom : this.printOutCom,
                             toggleToRefresh : true,
-                            role : this.role  
+                            role : this.role  ,
+                            checked : this.state.checked  
                         })
                     }
             }
@@ -339,7 +366,16 @@ class DeviceState extends Component{
         super(props)
         
         
-        this.theme = responsiveFontSizes(createMuiTheme());
+        this.theme = responsiveFontSizes(createMuiTheme(
+            {typography: {
+                h1: {
+                    fontSize: 200,
+                },
+                h2: {
+                    fontSize: 15,
+                },
+            },}
+        ));
         this.portReader = {}
         this.portWriter = {}
         this.rawData = ""
@@ -347,13 +383,15 @@ class DeviceState extends Component{
         this.state = {
             printOutCom : "",
             toggleToRefresh : false,
-            role : ""
+            role : "",
+            checked : false
           };
 
         this.queryInterval = {}
         this.initializePEVStrings()
         this.pevSendStartCommand = this.pevSendStartCommand.bind(this)
         this.pevSendStopCommand = this.pevSendStopCommand.bind(this)
+        this.handleContToggleSwitch = this.handleContToggleSwitch.bind(this)
         this.getRelatedIcon = this.getRelatedIcon.bind(this)
         this.linkMeasurements = []
     }
