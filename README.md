@@ -7,8 +7,5 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/boraciner/charger-emulator-interface">
-    <img src="public/logo.png" alt="Logo" width="300" height="80">
-  </a>
 
   <h3 align="center">Com port Web Interface</h3>
