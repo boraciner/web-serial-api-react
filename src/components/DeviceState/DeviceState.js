@@ -1,27 +1,13 @@
 import React,{Component} from 'react'
-import Timeline from '@material-ui/lab/Timeline';
-import TimelineItem from '@material-ui/lab/TimelineItem';
-import TimelineSeparator from '@material-ui/lab/TimelineSeparator';
-import TimelineConnector from '@material-ui/lab/TimelineConnector';
-import TimelineContent from '@material-ui/lab/TimelineContent';
-import TimelineDot from '@material-ui/lab/TimelineDot';
 import { createMuiTheme, responsiveFontSizes, ThemeProvider } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
-import EvStationIcon from '@material-ui/icons/EvStation';
-import DirectionsCarIcon from '@material-ui/icons/DirectionsCar';
-import FastfoodIcon from '@material-ui/icons/Fastfood';
-import FingerprintIcon from '@material-ui/icons/Fingerprint';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import SaveAltIcon from '@material-ui/icons/SaveAlt';
-import SettingsInputHdmiIcon from '@material-ui/icons/SettingsInputHdmi';
-import MailOutlineIcon from '@material-ui/icons/MailOutline';
-import EmailIcon from '@material-ui/icons/Email';
-import Typography from '@material-ui/core/Typography';
+import './DeviceState.css'
+import Tooltip from '@material-ui/core/Tooltip';
+
 
 class DeviceState extends Component{
     pevSendStartCommand(){
@@ -53,13 +39,9 @@ class DeviceState extends Component{
             justify="center"
             alignItems="center"
             
-            style={{
-               backgroundColor : "white"
-            }}
+           
             >
-            <Grid item xs={3}>
-                Test Action :
-            </Grid>
+            
             <Grid item xs={3}>
                 <ButtonGroup  variant="contained" color="primary" aria-label="contained primary button group">
                 <Button color="primary"  onClick={this.pevSendStartCommand}  >Start</Button>
@@ -86,87 +68,7 @@ class DeviceState extends Component{
         ) 
       }
       
-    getRelatedIcon(myKey){
-        switch(myKey){
-        case 0:
-            return(<FingerprintIcon/>)
-        case 1:
-            return(<ArrowForwardIcon/>)
-        case 2:
-            return(<ArrowBackIcon/>)
-        case 3:
-            return(<ArrowForwardIcon/>)
-        case 4:
-            return(<ArrowForwardIcon/>)
-        case 5:
-            return(<ArrowForwardIcon/>)
-        case 6:
-            return(<ArrowForwardIcon/>)
-        case 7:
-            return(<ArrowForwardIcon/>)
-        case 8:
-            return(<ArrowForwardIcon/>)
-        case 9:
-            return(<ArrowForwardIcon/>)
-        case 10:
-            return(<ArrowForwardIcon/>)
-        case 11:
-            return(<ArrowForwardIcon/>)
-        case 12:
-            return(<ArrowForwardIcon/>)
-        case 13:
-            return(<ArrowForwardIcon/>)
-        case 14:
-            return(<ArrowForwardIcon/>)
-        case 15:
-            return(<ArrowForwardIcon/>)
-        case 16:
-            return(<ArrowBackIcon/>)
-        case 17:
-            return(<ArrowForwardIcon/>)
-        case 18:
-            return(<ArrowForwardIcon/>)
-        case 19:
-            return(<ArrowBackIcon/>)
-        case 20:
-            return(<ArrowBackIcon/>)
-        case 21:
-            return(<ArrowBackIcon/>)
-        case 22:
-            return(<SaveAltIcon/>) //New keys set
-        case 23:
-            return(<SettingsInputHdmiIcon/>) //Link Measurement:
-        case 24:
-            return(<MailOutlineIcon/>) // Sending IPv6.
-        case 25:
-            return(<EmailIcon/>) // IPv6 Message is received   
-        default:
-            return(<FastfoodIcon/>)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-        }
-        
-    }
 
-    prepareTimeLineItem(content,isSecondary = false,myKey){
-        return(
-            <TimelineItem key={myKey} > 
-                <TimelineSeparator>
-                <TimelineDot color={isSecondary ? "secondary" : "primary"} style={{display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center"}}>
-                    {this.getRelatedIcon(myKey)}
-                </TimelineDot>
-                <TimelineConnector />
-                </TimelineSeparator>
-                <TimelineContent  style={{display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "start",
-                    paddingTop: "20px",}}>
-                    {content}
-                </TimelineContent>
-            </TimelineItem>
-        )
-    }
 
     
 
@@ -176,17 +78,6 @@ class DeviceState extends Component{
             {details : "CM_SLAC_PARAM.REQ sent",display : "CM_SLAC_PARAM.REQ sent",found : false},
             {details : "CM_SLAC_PARAM.CNF received",display : "CM_SLAC_PARAM.CNF received",found : false},
             {details : "CM_START_ATTEN_CHAR.IND sent",display : "CM_START_ATTEN_CHAR.IND sent",found : false},
-            {details : "CM_START_ATTEN_CHAR.IND sent",display : "CM_START_ATTEN_CHAR.IND sent",found : false},
-            {details : "CM_START_ATTEN_CHAR.IND sent",display : "CM_START_ATTEN_CHAR.IND sent",found : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
             {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false},
             {details : "CM_ATTEN_CHAR.IND received",display : "CM_ATTEN_CHAR.IND received",found : false},
             {details : "CM_ATTEN_CHAR.RSP sent",display : "CM_ATTEN_CHAR.RSP sent",found : false},
@@ -205,41 +96,31 @@ class DeviceState extends Component{
     }
 
     preparePEVTimeLine(){
+        console.log("this.pevStrings.length ",this.pevStrings.length)
         return(
-            <div>
-            <ThemeProvider theme={this.theme}>
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}>
-            <DirectionsCarIcon style={{ color: 'green' , fontSize: '60px'} }/>
+            
+            <div ref={this.wrapper}>
+                <ol className="timeline">
+                {
+                    this.pevStrings.map((value,key)=>(
+                        <Tooltip title={value.display} key={key} ref={this.wrapper}>
+                            <li style={{
+                                color:'blue',
+                                
+                                }}></li>               
+                        </Tooltip>   
+                     ))
+                   
+                }
+                </ol>
             </div>
-            </ThemeProvider>
-            <ThemeProvider theme={this.theme}>
-            <Typography variant="h2">
-            <Timeline align="alternate" >
-            {
-                this.pevStrings.map((value,key)=>(
-                   this.prepareTimeLineItem(value.display,value.found,key)                      
-                ))
-            }
-            </Timeline>
-            </Typography>  
-            </ThemeProvider>
-            </div>
-            )
-    }
-    prepareEVSETimeLine(){
-        return(
-            <div>
-            <ThemeProvider theme={this.theme}>
-            <EvStationIcon/>
-            </ThemeProvider>
-            </div>
-            )
-    }
 
+            
+            
+            
+            )
+    }
+  
   
     componentDidMount(){
         this.OpenReadComPort();
@@ -275,13 +156,13 @@ class DeviceState extends Component{
                             {
                                 let measurementValue = sCommand.split(':')
                                 if(measurementValue.length>1){
-                                    this.pevStrings[23].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
+                                    this.pevStrings[12].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
                                 }
                             }
                            
                             this.pevStrings[i].found = true
                             nowFound = true
-                            if(i === 25 && this.state.checked === true)// IPv6 Message
+                            if(i === 13 && this.state.checked === true)// IPv6 Message
                             {
                                 setTimeout(()=>{this.pevSendStopCommand()},15000);
                             }else if(i === 0 && this.state.checked === true)// IPv6 Message
@@ -383,7 +264,7 @@ class DeviceState extends Component{
         this.state = {
             printOutCom : "",
             toggleToRefresh : false,
-            role : "",
+            role : "PEV",
             checked : false
           };
 
@@ -392,9 +273,10 @@ class DeviceState extends Component{
         this.pevSendStartCommand = this.pevSendStartCommand.bind(this)
         this.pevSendStopCommand = this.pevSendStopCommand.bind(this)
         this.handleContToggleSwitch = this.handleContToggleSwitch.bind(this)
-        this.getRelatedIcon = this.getRelatedIcon.bind(this)
         this.linkMeasurements = []
     }
+
+    /*
     render(){
         return (
             <div>
@@ -404,16 +286,60 @@ class DeviceState extends Component{
                 </div>
                 {
                     this.state.role === "PEV" ?
-                    this.preparePEVTimeLine() : 
-                        this.state.role === "EVSE" ? 
-                        this.prepareEVSETimeLine() : null  
+                    this.preparePEVTimeLine() : null  
                 }
                 
                 <h3>{this.state.printOutCom}</h3>
             </div>
             );
+    }*/
+    render(){
+        return (
+            <div>
+                <h1 class="cs">FoE-Charger Test Interface</h1>
+                    <div class="circle cir"><p class="c">F</p>
+                    <div class="circle one"></div>
+                    <div class="circle two">
+                        <div class="circle three">
+                    </div>
+                    </div>
+                    </div>
+
+                    <div class="wrapper">
+                    <div class="bar left"></div>
+                    <div class="bar top"></div>
+                    <div class="bar right"></div>
+                    <div class="bar bottom"></div>
+                    <br/><br/><br/>
+                    <div class="button">
+                        <span class="button__text">Start</span>
+                    </div>
+                    <div class="button">
+                        <span class="button__text">Stop</span>
+                    </div>
+                    <p>
+                        Bora Ciner.....................................................................................OK
+                    </p>
+                    
+                    <ol className="timeline">
+                        <li>list item</li>
+                        <li>list item</li>
+                    </ol>
+                    <div style={{width:'400px',
+                                 height:'80px'}}>
+                    <div class="ui panel">
+                        <div class="ui panel content">
+                        <strong>Test</strong><br /> Testing testing testing...
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+               
+            </div>
+            );
     }
+
+
+
 }
-
-
 export default DeviceState

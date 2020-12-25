@@ -1,17 +1,11 @@
 import React, {Component} from "react";
-import Header from "./components/Header/Header"
 import DeviceState from './components/DeviceState/DeviceState'
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Header from "./components/Header/Header"
 
-var sectionStyle = {
-  width: "100%",
-  height: "100%",
-  background: "linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(105,255,90,1) 12%, rgba(19,66,0,1) 100%)",
-};
 
 const Contact = props => {
   return(
@@ -123,7 +117,7 @@ class App extends Component{
   render(){
     console.log("render....")
   return (
-    <div style={ sectionStyle } >
+    <div >
       <Header/>
       <Router>
       <Switch>
@@ -136,9 +130,9 @@ class App extends Component{
               {this.prepareComPortSelectButtons()}
             </Grid>
             <Grid item xs={12}>
-              <Paper style={{backgroundColor: 'rgba(255,255,255,.1)'}}>
+              <div>
                 {this.state.p1.selected === true ? <DeviceState port={this.state.p1}/ > : null}
-              </Paper>
+              </div>
             </Grid>
           </Grid>
         </Route>
