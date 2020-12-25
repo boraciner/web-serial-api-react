@@ -86,10 +86,10 @@ body {
   50% {border-left:25px solid #222;}
   100% {border-left:25px solid #E6E6E6;}
 }
-.cs:hover{
+.cs{
   opacity:1;
   text-shadow: 0 0 .6em #2DE0DD;
-  -animation: blink 1s ease infinite;
+  animation: blink 1s ease infinite;
 }
 
 p{
