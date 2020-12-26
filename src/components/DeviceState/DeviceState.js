@@ -8,7 +8,6 @@ import Grid from '@material-ui/core/Grid';
 import './DeviceState.css'
 import Tooltip from '@material-ui/core/Tooltip';
 
-
 class DeviceState extends Component{
 
     pevSendStartCommand(){
@@ -279,6 +278,7 @@ class DeviceState extends Component{
             return null;
         }
     }
+    handleBoxToggle = () => {console.log("hoverrrrrrrrrrrrr")};
 
 
     render(){
@@ -298,14 +298,25 @@ class DeviceState extends Component{
                     <div className="bar top"></div>
                     <div className="bar right"></div>
                     <div className="bar bottom"></div>
-                    <br/><br/><br/>
+                    <br/>
+                    <Grid container>
+                    <Grid item xs={3}>
+                    <div className='Action_button_1'/>
+                    </Grid>
+                    <Grid item xs={3}>
+                    <div className='Action_button_2'/>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <div className='parentWheel'>
+                            <div className='Outer_wheel'/>
+                            <div className='Wheel_Base'/>
+                            <div className='Ineer_wheel'/>
+                        </div>
                     
-                    <div className="button">
-                        <span className="button__text" onClick={this.pevSendStartCommand}>Start</span>
-                    </div>
-                    <div className="button">
-                        <span className="button__text" onClick={this.pevSendStopCommand}>Stop</span>
-                    </div>
+                    </Grid>
+                    </Grid>
+                    
+                    
                     <Grid container>
                     <Grid item xs={6}>
                         {this.showDetailedProgress()}

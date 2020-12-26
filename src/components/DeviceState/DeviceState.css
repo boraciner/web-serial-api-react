@@ -385,3 +385,124 @@ a:visited {text-decoration:none; color: #FFFFFF;}
   background-repeat: no-repeat;
   display: inline-block;
 }
+
+
+
+  .Action_button_1 {
+    background-image: url("../../images/ACTION_N.png");
+    position: absolute;
+    width: 167px;
+    height: 110px;
+    z-index: 213;
+    left: -6px;
+  }
+
+  .Action_button_1:hover{
+    background: url("../../images/ACTION_H.png");
+    left: 0px;
+  }
+
+
+  .Action_button_1:active{
+    background: url("../../images/ACTION_P.png");
+    position: absolute;
+    left: 0px;
+  }
+
+
+
+  .Action_button_2 {
+    background-image: url("../../images/STOP_N.png");
+    position: absolute;
+    width: 167px;
+    height: 110px;
+    z-index: 213;
+    left: 200px;
+  }
+
+  .Action_button_2:hover{
+    background: url("../../images/STOP_H.png");
+    left: 206px;
+  }
+
+
+  .Action_button_2:active{
+    background: url("../../images/STOP_P.png");
+    position: absolute;
+    left: 206px;
+  }
+
+
+
+
+
+
+
+
+  @-webkit-keyframes rotating /* Safari and Chrome */ {
+    from {
+      -webkit-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(360deg);
+      -o-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes rotating {
+    from {
+      -ms-transform: rotate(0deg);
+      -moz-transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to {
+      -ms-transform: rotate(360deg);
+      -moz-transform: rotate(360deg);
+      -webkit-transform: rotate(360deg);
+      -o-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
+  .parentWheel{
+    width: 156px;
+    height: 156px;
+    position: relative;
+  }
+
+  .Outer_wheel {
+    background: url("../../images/Outerwheel.png");
+    width: 156px;
+    height: 156px;
+    position: absolute;
+    z-index: 7;
+  }
+  .Ineer_wheel {
+    background: url("../../images/Innerwheel.png");
+    width: 116px;
+    height: 116px;
+    position: absolute;
+    background-repeat: no-repeat;
+    top: 20px;
+    right: 20px;
+    -webkit-animation: rotating 1s linear infinite;
+    -moz-animation: rotating 1s linear infinite;
+    -ms-animation: rotating 1s linear infinite;
+    -o-animation: rotating 1s linear infinite;
+    animation: rotating 1s linear infinite;
+  }
+
+  .Wheel_Base{
+    background: url("../../images/wheelbase.png");
+    width: 71px;
+    height: 71px;
+    position: absolute;
+    background-repeat: no-repeat;
+    top: 42px;
+    right: 42px;
+  }
+
