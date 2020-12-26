@@ -53,6 +53,8 @@ class DeviceState extends Component{
             {details : "IPv6 Message is received",display : "IPv6 Message is received",found : false,warning : false},	
             {details : "TIMEOUT",display : "Timeout Occured",found : false,warning : true},	
         ]
+        
+        
     }
 
     
@@ -215,6 +217,8 @@ class DeviceState extends Component{
         this.showDetailedProgress = this.showDetailedProgress.bind(this)
         this.showLinkPanel = this.showLinkPanel.bind(this)
         this.linkMeasurements = []
+
+
     }
 
   
@@ -234,7 +238,9 @@ class DeviceState extends Component{
                     }
                     else{
                         return(
-                            <p key={"detailed_"+index} style={{color:'#c20b0b'}}>
+                            <p key={"detailed_"+index} style={{color:'#c20b0b',
+                                                               textShadow: '0 0 0.4em #c20b0b'
+                                                               }} id='warningTextFeature'>
                                 {value.display}
                             </p>
                         );
@@ -252,15 +258,14 @@ class DeviceState extends Component{
         if(this.linkMeasurements != null && this.linkMeasurements.length > 0)
         { 
             return(
-                <div style={{width:'400px',
-                        height:'80px'}}>
+                <div >
                 <div className="ui panel">
                     <div className="ui panel content">
                     {
                         this.linkMeasurements.map((value,index)=>{
                             return(
                                 <>
-                                <strong key={index}>Link Time</strong> {value}<br /> 
+                                <strong key={index}>Link Time</strong> {value} ms.<br /> 
                                 </>
                             );
                         })
@@ -301,8 +306,15 @@ class DeviceState extends Component{
                     <div className="button">
                         <span className="button__text" onClick={this.pevSendStopCommand}>Stop</span>
                     </div>
-                    {this.showDetailedProgress()}                
+                    <Grid container>
+                    <Grid item xs={6}>
+                        {this.showDetailedProgress()}
+                    </Grid>
+                    <Grid item xs={6}>
                     {this.showLinkPanel()}
+                    </Grid>
+                    </Grid>                
+                    
                     </div>
             </div>
             );

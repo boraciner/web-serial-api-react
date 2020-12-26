@@ -96,7 +96,18 @@ p{
   color:#2DE0DD;
 }
 
-
+@keyframes warningTextAnim{
+  0%{     color: #c20b0b;    }
+  49%{    color: #c20b0b; }
+  60%{    color: transparent; }
+  99%{    color: transparent;  }
+  100%{   color: #c20b0b;    }
+}
+#warningTextFeature{
+  opacity:1;
+  text-shadow: 0 0 .6em #c20b0b;
+  animation: warningTextAnim 1s ease infinite;
+}
 
 
 
