@@ -8,22 +8,22 @@ export default function Header() {
 
 
   return (
-    <div class="bodyWrapper">
+    <div className="bodyWrapper">
     <header>
-      <div class="signBlock">
-        <div class="topCover"></div>
-          <div class="headerContent">
-            <div class="headerLinks">
+      <div className="signBlock">
+        <div className="topCover"></div>
+          <div className="headerContent">
+            <div className="headerLinks">
             <h1>Pontis EMC GmbH</h1>
-                <div class="signLinks">
+                <div className="signLinks">
                 <h3>Test Web Interface</h3>
                 </div>       
             </div>
           </div>
-            <div class="boxEdges1">
-              <div class="boxEdges2">
-                <div class="slider"></div>
-                <div class="headerLine"></div>
+            <div className="boxEdges1">
+              <div className="boxEdges2">
+                <div className="slider"></div>
+                <div className="headerLine"></div>
               </div>
             </div>
         </div>

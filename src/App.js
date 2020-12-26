@@ -109,7 +109,7 @@ class App extends Component{
   prepareComPortSelectButtons(){
     return(
       <ButtonGroup disableElevation variant="contained" color="secondary">
-        {this.state.p1.selected === false ? <Button onClick={this.selectCom1} key="c1">COM</Button> : null}
+        {this.state.p1.selected === false ? <Button onClick={this.selectCom1} key="c1">Select COM Port to Continue</Button> : null}
         {/*this.state.p2.selected === false ? <Button onClick={this.selectCom2} key="c2">COM</Button> : null*/}
       </ButtonGroup>
       )

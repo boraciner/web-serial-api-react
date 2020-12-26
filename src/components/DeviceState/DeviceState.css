@@ -96,6 +96,11 @@ p{
   color:#2DE0DD;
 }
 
+
+
+
+
+
 .circle.cir{
   position:absolute;
   left:13%;
@@ -289,7 +294,6 @@ a:visited {text-decoration:none; color: #FFFFFF;}
   justify-content: center;
 }
 .button{
-  touch-callout: none;
   user-select: none;
   display: inline-block;
   border: .2em solid;
