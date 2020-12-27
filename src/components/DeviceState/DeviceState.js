@@ -1,12 +1,7 @@
-import React,{Component, useState} from 'react'
+import React,{Component} from 'react'
 import { createMuiTheme, responsiveFontSizes} from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
 import './DeviceState.css'
-import Tooltip from '@material-ui/core/Tooltip';
 
 class DeviceState extends Component{
 
@@ -15,6 +10,13 @@ class DeviceState extends Component{
         const data = new Uint8Array([32]); // space
             this.portWriter.write(data).then(res=>{
             });
+        this.setState({  printOutCom : this.printOutCom,
+            toggleToRefresh : this.toggleToRefresh,
+            role : this.state.role  ,
+            percentage : 0,
+            started : true,
+            continuousTest : this.state.continuousTest
+        })
     }
     handleContToggleSwitch(event){
 
@@ -30,8 +32,9 @@ class DeviceState extends Component{
             printOutCom : this.printOutCom,
             toggleToRefresh : true,
             role : this.role,
-            checked : this.state.checked,
-            percentage : 0
+            percentage : 0,
+            started : false,
+            continuousTest : this.state.continuousTest
         })
     }
     initializePEVStrings(){
@@ -74,8 +77,9 @@ class DeviceState extends Component{
                     this.setState({  printOutCom : this.printOutCom,
                                         toggleToRefresh : this.toggleToRefresh,
                                         role : this.role  ,
-                                        checked : this.state.checked,  
-                                        percentage : this.state.percentage
+                                        percentage : this.state.percentage,
+                                        started : this.state.started,
+                                        continuousTest : this.state.continuousTest
                                     })
             }
             else if(sCommand.includes("ROLE:EVSE"))
@@ -85,8 +89,9 @@ class DeviceState extends Component{
                     this.setState({  printOutCom : this.printOutCom,
                                         toggleToRefresh : this.toggleToRefresh,
                                         role : this.role ,
-                                        checked : this.state.checked ,  
-                                        percentage : this.state.percentage  })
+                                        percentage : this.state.percentage,
+                                        started : this.state.started,
+                                        continuousTest : this.state.continuousTest  })
             }else{
                     let nowFound = false;
                     for(let i=0;i<this.pevStrings.length;i++){
@@ -105,10 +110,10 @@ class DeviceState extends Component{
                            
                             this.pevStrings[i].found = true
                             nowFound = true
-                            if(i === 13 && this.state.checked === true)// IPv6 Message
+                            if(i === 13 && this.state.continuousTest === true)// IPv6 Message
                             {
                                 setTimeout(()=>{this.pevSendStopCommand()},15000);
-                            }else if(i === 0 && this.state.checked === true)// IPv6 Message
+                            }else if(i === 0 && this.state.continuousTest === true)// PIB image reading completed OK
                             {
                                 setTimeout(()=>{this.pevSendStartCommand()},5000);
                             }
@@ -128,8 +133,9 @@ class DeviceState extends Component{
                             printOutCom : this.printOutCom,
                             toggleToRefresh : !this.state.toggleToRefresh,
                             role : this.role  ,
-                            checked : this.state.checked  ,  
-                            percentage : percCalc
+                            percentage : percCalc,
+                            started : true,
+                            continuousTest : this.state.continuousTest
                         })
                     }
             }
@@ -215,7 +221,9 @@ class DeviceState extends Component{
             toggleToRefresh : false,
             role : "PEV",
             checked : false,  
-            percentage : 0
+            percentage : 0,
+            started : false,
+            continuousTest : false
           };
 
         this.queryInterval = {}
@@ -225,8 +233,11 @@ class DeviceState extends Component{
         this.handleContToggleSwitch = this.handleContToggleSwitch.bind(this)
         this.showDetailedProgress = this.showDetailedProgress.bind(this)
         this.showLinkPanel = this.showLinkPanel.bind(this)
+        this.setContinuosState = this.setContinuosState.bind(this)
         this.linkMeasurements = []
+        
 
+        
 
     }
 
@@ -254,6 +265,8 @@ class DeviceState extends Component{
                             </p>
                         );
                     }
+                }else{
+                    return null;
                 }
             })
               
@@ -288,8 +301,16 @@ class DeviceState extends Component{
             return null;
         }
     }
-    handleBoxToggle = () => {console.log("hoverrrrrrrrrrrrr")};
 
+    setContinuosState(){
+        this.setState({  printOutCom : this.printOutCom,
+            toggleToRefresh : this.state.toggleToRefresh,
+            role : this.state.role  ,
+            percentage : this.state.percentage,
+            started : this.state.started,
+            continuousTest : !this.state.continuousTest
+        })
+    }
 
     render(){
         return (
@@ -318,13 +339,24 @@ class DeviceState extends Component{
                     <Grid item xs={2}>
                     <div className='Action_button_2' onClick={this.pevSendStopCommand}/>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={2} >
+                        <div style={{marginTop: '20px'}}>
+                            <span className='continuousText'>Continuous Test</span>
+                            {
+                                this.state.continuousTest ? 
+                                    <div style={{marginLeft: '30px'}} className='continuousSelectionSelected' onClick={this.setContinuosState} />: 
+                                    <div style={{marginLeft: '30px'}} className='continuousSelectionUnselected' onClick={this.setContinuosState} /> 
+                            }
+                            
+                        </div>
+                    </Grid>
+                    <Grid item xs={2}>
                     </Grid>
                     <Grid item xs={2} >
                         <div className='parentWheel'>
                             <div className='Outer_wheel'/>
                             <div className='Wheel_Base'/>
-                            <div className='Ineer_wheel'/>
+                            {this.state.started ? <div className='Ineer_wheel Ineer_wheel_Animation'/> : <div className='Ineer_wheel'/>}
                             <div className='Percentage_wheel'><span id='percentage'>{this.state.percentage}</span>%</div>
                         </div>
                     

@@ -495,12 +495,17 @@ a:visited {text-decoration:none; color: #FFFFFF;}
     background-repeat: no-repeat;
     top: 20px;
     right: 20px;
+    
+  }
+
+  .Ineer_wheel_Animation {
     -webkit-animation: rotating 1s linear infinite;
     -moz-animation: rotating 1s linear infinite;
     -ms-animation: rotating 1s linear infinite;
     -o-animation: rotating 1s linear infinite;
     animation: rotating 1s linear infinite;
   }
+
 
   .Percentage_wheel{
     top: 70px;
@@ -525,3 +530,25 @@ a:visited {text-decoration:none; color: #FFFFFF;}
     right: 42px;
   }
 
+.continuousText{
+  font-size: 13.583px;
+  font-family: "Anita  Semi-square";
+  color: rgb(0, 191, 243);
+  line-height: 1.2;
+}
+
+.continuousSelectionSelected{
+  background: url("../../images/checkboxChecked.png");
+  width: 62px;
+  height: 55px;
+  position: absolute;
+  background-repeat: no-repeat;
+}
+
+.continuousSelectionUnselected{
+  background: url("../../images/checkboxUnchecked.png");
+  width: 62px;
+  height: 55px;
+  position: absolute;
+  background-repeat: no-repeat;
+}
