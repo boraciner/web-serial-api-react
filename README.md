@@ -7,7 +7,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <h3 align="center">Com port Web Interface</h3>
+  <h3 align="center">WEB SERIAL API & React Interface</h3>
   <br />
   <img src="src/advert/myGif.gif" alt="Logo" width="1851" height="418"/>
 </p>
