@@ -1,4 +1,22 @@
-body{
-    background: rgb(204, 183, 183);
-  }
- 
+
+.parentMessageBox{
+  background: url("images/MessageBox.png");
+  width: 454px;
+  height: 263px;
+  margin: auto;
+  background-repeat: no-repeat;
+  margin-top: 200px;
+}
+
+
+.messageBoxSelectButton{
+  background: url("./images/SELECT.png");
+  background-repeat: no-repeat;
+  position: relative;
+  width: 164px;
+  height: 107px;
+  margin: auto;
+  top: 160px;
+}
+
+

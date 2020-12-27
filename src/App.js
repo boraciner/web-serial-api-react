@@ -1,11 +1,9 @@
 import React, {Component} from "react";
 import DeviceState from './components/DeviceState/DeviceState'
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Header from "./components/Header/Header"
-
+import './App.css';
 
 const Contact = props => {
   return(
@@ -106,14 +104,21 @@ class App extends Component{
       this.AskUserForComport(2)   
   }
 
+
   prepareComPortSelectButtons(){
-    return(
-      <ButtonGroup disableElevation variant="contained" color="secondary">
-        {this.state.p1.selected === false ? <Button onClick={this.selectCom1} key="c1">Select COM Port to Continue</Button> : null}
-        {/*this.state.p2.selected === false ? <Button onClick={this.selectCom2} key="c2">COM</Button> : null*/}
-      </ButtonGroup>
-      )
+    console.log("Create Message box")
+
+    if(this.state.p1.selected === false)
+      return(
+        <div className='parentMessageBox'>
+            <div className='messageBoxSelectButton' onClick={this.selectCom1} key="c1"/>
+        </div>  
+        )
+    else
+      return null;
   }
+
+
   render(){
     console.log("render....")
   return (
@@ -125,10 +130,8 @@ class App extends Component{
           <Contact />
         </Route>
         <Route>
-          <Grid container spacing={0}  >
-            <Grid item xs={12}>
-              {this.prepareComPortSelectButtons()}
-            </Grid>
+          {this.prepareComPortSelectButtons()}
+          <Grid container justify='center'>
             <Grid item xs={12}>
               <div>
                 {this.state.p1.selected === true ? <DeviceState port={this.state.p1}/ > : null}

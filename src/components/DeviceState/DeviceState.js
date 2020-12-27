@@ -257,15 +257,15 @@ class DeviceState extends Component{
         if(this.linkMeasurements != null && this.linkMeasurements.length > 0)
         { 
             return(
-                <div >
+                <div  id='linkpanelid1'>
                 <div className="ui panel">
                     <div className="ui panel content">
                     {
                         this.linkMeasurements.map((value,index)=>{
                             return(
-                                <>
-                                <strong key={index}>Link Time</strong> {value} ms.<br /> 
-                                </>
+                                <div key={'mydivkey'+index}>
+                                <strong key={'mykey'+index}>Link Time</strong> {value} ms.<br /> 
+                                </div>
                             );
                         })
                     }       
@@ -301,10 +301,10 @@ class DeviceState extends Component{
                     <br/>
                     <Grid container>
                     <Grid item xs={3}>
-                    <div className='Action_button_1'/>
+                    <div className='Action_button_1' onClick={this.pevSendStartCommand}/>
                     </Grid>
                     <Grid item xs={3}>
-                    <div className='Action_button_2'/>
+                    <div className='Action_button_2' onClick={this.pevSendStopCommand}/>
                     </Grid>
                     <Grid item xs={3}>
                         <div className='parentWheel'>
