@@ -2,6 +2,12 @@
 @import url(https://fonts.googleapis.com/css?family=Audiowide);
 @import url(https://fonts.googleapis.com/css?family=Lato:100,300,400,700);
 
+@font-face {
+  font-family: "Anita";
+  src: url("../../fonts/Anitasemisquare.ttf") format("ttf"),
+  }
+
+
 * {
   margin: 0;
   padding: 0;
@@ -495,6 +501,19 @@ a:visited {text-decoration:none; color: #FFFFFF;}
     -o-animation: rotating 1s linear infinite;
     animation: rotating 1s linear infinite;
   }
+
+  .Percentage_wheel{
+    top: 70px;
+    left: 62px;
+    font-size: 13.583px;
+    font-family: "Anita  Semi-square";
+    color: rgb(0, 191, 243);
+    line-height: 1.2;
+    text-align: left;
+    position: absolute;
+    z-index: 10;
+  }
+
 
   .Wheel_Base{
     background: url("../../images/wheelbase.png");

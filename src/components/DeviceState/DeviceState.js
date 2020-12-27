@@ -30,7 +30,8 @@ class DeviceState extends Component{
             printOutCom : this.printOutCom,
             toggleToRefresh : true,
             role : this.role,
-            checked : this.state.checked  
+            checked : this.state.checked,
+            percentage : 0
         })
     }
     initializePEVStrings(){
@@ -73,7 +74,8 @@ class DeviceState extends Component{
                     this.setState({  printOutCom : this.printOutCom,
                                         toggleToRefresh : this.toggleToRefresh,
                                         role : this.role  ,
-                                        checked : this.state.checked  
+                                        checked : this.state.checked,  
+                                        percentage : this.state.percentage
                                     })
             }
             else if(sCommand.includes("ROLE:EVSE"))
@@ -83,7 +85,8 @@ class DeviceState extends Component{
                     this.setState({  printOutCom : this.printOutCom,
                                         toggleToRefresh : this.toggleToRefresh,
                                         role : this.role ,
-                                        checked : this.state.checked   })
+                                        checked : this.state.checked ,  
+                                        percentage : this.state.percentage  })
             }else{
                     let nowFound = false;
                     for(let i=0;i<this.pevStrings.length;i++){
@@ -115,12 +118,18 @@ class DeviceState extends Component{
 
                     if(nowFound === true){
                         console.warn("OKKKKKKKK")
+                        let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-1)) * 100)
+                        if(percCalc >= 90)
+                            percCalc = 100;
+                        
+                        percCalc = Math.round(percCalc)
 
                         this.setState({  
                             printOutCom : this.printOutCom,
                             toggleToRefresh : !this.state.toggleToRefresh,
                             role : this.role  ,
-                            checked : this.state.checked  
+                            checked : this.state.checked  ,  
+                            percentage : percCalc
                         })
                     }
             }
@@ -205,7 +214,8 @@ class DeviceState extends Component{
             printOutCom : "",
             toggleToRefresh : false,
             role : "PEV",
-            checked : false
+            checked : false,  
+            percentage : 0
           };
 
         this.queryInterval = {}
@@ -300,17 +310,22 @@ class DeviceState extends Component{
                     <div className="bar bottom"></div>
                     <br/>
                     <Grid container>
-                    <Grid item xs={3}>
+                    <Grid item xs={2}>
+                    </Grid>
+                    <Grid item xs={2}>
                     <div className='Action_button_1' onClick={this.pevSendStartCommand}/>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={2}>
                     <div className='Action_button_2' onClick={this.pevSendStopCommand}/>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={4}>
+                    </Grid>
+                    <Grid item xs={2} >
                         <div className='parentWheel'>
                             <div className='Outer_wheel'/>
                             <div className='Wheel_Base'/>
                             <div className='Ineer_wheel'/>
+                            <div className='Percentage_wheel'><span id='percentage'>{this.state.percentage}</span>%</div>
                         </div>
                     
                     </Grid>
