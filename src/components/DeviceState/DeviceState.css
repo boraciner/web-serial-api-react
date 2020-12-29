@@ -552,3 +552,22 @@ a:visited {text-decoration:none; color: #FFFFFF;}
   position: absolute;
   background-repeat: no-repeat;
 }
+
+.linkMeasurementsReset{
+  background: url("../../images/restarticon_n.png");
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  background-repeat: no-repeat;
+}
+
+.linkMeasurementsReset:hover{
+  background: url("../../images/restarticon_h.png");
+}
+
+
+.linkMeasurementsReset:active{
+  background: url("../../images/restarticon_click.png");
+}
+
+

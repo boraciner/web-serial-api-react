@@ -3,8 +3,10 @@ import { createMuiTheme, responsiveFontSizes} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import './DeviceState.css'
 
+
 class DeviceState extends Component{
 
+    
     pevSendStartCommand(){
         console.log("Send Start Command")
         const data = new Uint8Array([32]); // space
@@ -26,6 +28,9 @@ class DeviceState extends Component{
         const data = new Uint8Array([100]); // d
         this.portWriter.write(data).then(res=>{
         });
+
+        clearInterval( this.timeoutStartInterval );
+        clearInterval( this.timeoutStopInterval );
 
         this.initializePEVStrings();
         this.setState({  
@@ -65,9 +70,9 @@ class DeviceState extends Component{
     setTimedoutStartCommand(timerValue){
         var timeoutStartCounter = timerValue
         console.log("setTimedoutStartCommand | begin")
-        var timeoutStartInterval = setInterval(() => {
+        this.timeoutStartInterval = setInterval(() => {
             if(timeoutStartCounter-- > 3){
-                this.pevStrings[16].display = "Timeout To Reconnect in "+timeoutStartCounter+" sec(s)."  
+                this.pevStrings[16].display = "Reconnecting in "+timeoutStartCounter+" sec(s)."  
                 this.pevStrings[16].found = true 
                 console.log("setTimedoutStartCommand | set text to ",this.pevStrings[16].display)
                 this.setState({  
@@ -91,7 +96,7 @@ class DeviceState extends Component{
                     started : true,
                     continuousTest : this.state.continuousTest
                 })
-                clearInterval( timeoutStartInterval );
+                clearInterval( this.timeoutStartInterval );
             }
         }, 1000);
     }
@@ -99,7 +104,7 @@ class DeviceState extends Component{
 
     setTimedoutStopCommand(timerValue){
         var timeoutStopCounter = timerValue
-        var timeoutStopInterval = setInterval(() => {
+        this.timeoutStopInterval = setInterval(() => {
             if(timeoutStopCounter-- > 0){
                 this.pevStrings[15].display = "Disconnecting in "+timeoutStopCounter+" sec(s)."
                 this.pevStrings[15].found = true
@@ -118,7 +123,7 @@ class DeviceState extends Component{
                 this.pevSendStopCommand();
                 this.pevStrings[15].found = false
                 this.setTimedoutStartCommand(20);
-                clearInterval( timeoutStopInterval );
+                clearInterval( this.timeoutStopInterval );
             }
         }, 1000);
     }
@@ -129,7 +134,6 @@ class DeviceState extends Component{
     }
 
     ProcessSplittedCommand(sCommand){
-        console.warn("sCommand ",sCommand)
         if(sCommand.length > 5){
             if(sCommand.includes("ROLE:PEV"))
             {
@@ -156,42 +160,35 @@ class DeviceState extends Component{
             }else{
                     let nowFound = false;
                     for(let i=0;i<this.pevStrings.length;i++){
-                        //console.log("Compare ",sCommand, " with ",this.pevStrings[i].details)
                         if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
-                            if(sCommand.includes(this.pevStrings[12].details))//Link Measurement
+                            this.pevStrings[i].found = true
+                            nowFound = true
+                            //console.log("ProcessSplittedCommand sCommand i=", i)
+                            if(i === 12)//Link Measurement
                             {
+                                
                                 let measurementValue = sCommand.split(':')
                                 if(measurementValue.length>1){
                                     this.pevStrings[12].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
                                     this.linkMeasurements.push(measurementValue[1].trim())
-
-                                    
                                 }
                             }
-                           
-                            
-                            console.warn("ProcessSplittedCommand i = " , i)
-
-                            if(this.pevStrings[i].found === false){
-
-                                console.warn("ProcessSplittedCommand ok1 ")
-
-                                if(i === 13 && this.state.continuousTest === true)// IPv6 Message
+                            else if(i === 13 && this.state.continuousTest === true)// IPv6 Message
+                            {
+                                //setTimeout(()=>{this.pevSendStopCommand()},15000);
+                                this.setTimedoutStopCommand(15);
+                            }else if(i === 0 && this.state.continuousTest === true)// PIB image reading completed OK
+                            {
+                                //setTimeout(()=>{this.pevSendStartCommand()},5000);
+                            }else if(i === 15)// TIMEOUT
+                            {
+                                console.warn("ProcessSplittedCommand  | this.linkMeasurements.push(Timeout) ")
+                                this.linkMeasurements.push("Timeout")
+                                if(this.state.continuousTest === true)
                                 {
-                                    //setTimeout(()=>{this.pevSendStopCommand()},15000);
-                                    this.setTimedoutStopCommand(15);
-                                }else if(i === 0 && this.state.continuousTest === true)// PIB image reading completed OK
-                                {
-                                    //setTimeout(()=>{this.pevSendStartCommand()},5000);
-                                }else if(i === 15 && this.state.continuousTest === true)// TIMEOUT
-                                {
-                                    console.warn("ProcessSplittedCommand ok2 ")
                                     this.setTimedoutStopCommand(5);
                                 }
-                                this.pevStrings[i].found = true
-                                nowFound = true
                             }
-                            
                             break;
                         }
                     }
@@ -226,11 +223,9 @@ class DeviceState extends Component{
         let commandArray = this.rawData.split('*')
         if(commandArray.length>1){
             commandArray.forEach(item=>{
-                console.log("item : "+item)
                 this.ProcessSplittedCommand(item)
             })
             this.rawData = commandArray[commandArray.length-1]
-            console.log("this.rawData : "+this.rawData)
         }
         
     }
@@ -309,13 +304,26 @@ class DeviceState extends Component{
         this.showDetailedProgress = this.showDetailedProgress.bind(this)
         this.showLinkPanel = this.showLinkPanel.bind(this)
         this.setContinuosState = this.setContinuosState.bind(this)
+        this.resetLinkMeasurementsList = this.resetLinkMeasurementsList.bind(this)
         this.linkMeasurements = []
         
-
+        this.timeoutStartInterval = {}
+        this.timeoutStopInterval = {}
         
 
     }
 
+    resetLinkMeasurementsList(){
+        this.linkMeasurements = []
+        this.setState({  
+            printOutCom : this.printOutCom,
+            toggleToRefresh : !this.state.toggleToRefresh,
+            role : this.state.role  ,
+            percentage : this.state.percentage,
+            started : this.state.started,
+            continuousTest : this.state.continuousTest
+        })
+    }
   
     showDetailedProgress(){
         if(this.pevStrings != null && this.pevStrings.length > 0)
@@ -360,13 +368,27 @@ class DeviceState extends Component{
                     <div className="ui panel content">
                     {
                         this.linkMeasurements.map((value,index)=>{
-                            return(
-                                <div key={'mydivkey'+index}>
-                                <strong key={'mykey'+index}>Link Time</strong> {value} ms.<br /> 
-                                </div>
-                            );
+                            if(value === "Timeout")
+                            {
+                                return(
+                                    <div key={'mydivkey'+index}>
+                                    <strong key={'mykey'+index} style={{color:'#c20b0b',
+                                                               textShadow: '0 0 0.4em #c20b0b'
+                                                               }} >{value}</strong><br /> 
+                                    </div>
+                                );
+                            }
+                            else{
+                                return(
+                                    <div key={'mydivkey'+index}>
+                                    <strong key={'mykey'+index}>Link Time</strong> {value} ms.<br /> 
+                                    </div>
+                                );
+                            }
+                            
                         })
-                    }       
+                    }    
+                    <div style = {{ textAlign:'right' , justifyContent: 'right' , float: 'right' , height: '50px', width: '50px' }}> <div  className='linkMeasurementsReset ' onClick={this.resetLinkMeasurementsList} /> </div>
                     </div>
                 </div>
                 </div>
