@@ -63,13 +63,27 @@ class App extends Component{
             supported : true
           }
         )
+      }else{
+        this.setState(
+          {
+            p1 : this.state.p1,
+            p2 : this.state.p2,
+            supported : true
+          }
+        )
       }
     }catch(err){
+      let bSupport = false;
+      if(err.message === "Cannot read property 'getPorts' of undefined")
+        bSupport = false
+      else
+        bSupport = true
+
       this.setState(
         {
           p1 : this.state.p1,
           p2 : this.state.p2,
-          supported : false
+          supported : bSupport
         }
       )
     }
@@ -89,7 +103,7 @@ class App extends Component{
             {
               p1 : {id: this.state.p1.id, selected : true, port : p1},
               p2 : this.state.p2,
-              supported : this.supported
+              supported : this.state.supported
             }
           )
 
@@ -104,7 +118,7 @@ class App extends Component{
             {
               p1 : this.state.p1,
               p2 : {id: this.state.p2.id, selected : true, port : p2},
-              supported : this.supported
+              supported : this.state.supported
             }
           )
 
