@@ -12,6 +12,16 @@ const Contact = props => {
       </div>
     )
 }
+
+/*
+const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+const isOpera = (!!window.opr) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+const isFirefox = typeof InstallTrigger !== 'undefined';
+const isIE = false || !!document.documentMode;
+const isEdge = !isIE && !!window.StyleMedia;
+*/
+
+
 class App extends Component{
 
   constructor(props){
@@ -21,7 +31,7 @@ class App extends Component{
         {id: 1, selected : false, port : {},onClickHandler:this.selectCom1},
       p2 :
         {id: 2, selected : false, port : {},onClickHandler:this.selectCom2},
-      
+      supported : false
     };
 
     this.selectCom1 = this.selectCom1.bind(this)
@@ -32,21 +42,34 @@ class App extends Component{
   
   
   async componentDidMount(){
+    try{
     console.log("list of serial ports the website has been granted access to previously",navigator.serial.getPorts())
-    const portList = await navigator.serial.getPorts()
+
+      const portList = await navigator.serial.getPorts()
     
-    if(portList.length === 2){
+      if(portList.length === 2){
+        this.setState(
+          {
+            p1 : {id: portList[0].id, selected : true, port : portList[0]},
+            p2 : {id: portList[1].id, selected : false, port : portList[1]},
+            supported : true
+          }
+        )
+      }else if(portList.length === 1){
+        this.setState(
+          {
+            p1 : {id: portList[0].id, selected : true, port : portList[0]},
+            p2 : this.state.p2,
+            supported : true
+          }
+        )
+      }
+    }catch(err){
       this.setState(
         {
-          p1 : {id: portList[0].id, selected : true, port : portList[0]},
-          p2 : {id: portList[1].id, selected : false, port : portList[1]},
-        }
-      )
-    }else if(portList.length === 1){
-      this.setState(
-        {
-          p1 : {id: portList[0].id, selected : true, port : portList[0]},
-          p2 : this.state.p1,
+          p1 : this.state.p1,
+          p2 : this.state.p2,
+          supported : false
         }
       )
     }
@@ -61,11 +84,12 @@ class App extends Component{
         if(!this.state.p1.selected){
           console.log("list of serial ports the website has been granted access to previously",navigator.serial.getPorts())
           const p1 = await navigator.serial.requestPort()
-          
+          console.log("AskUserForComport p1",p1)
           this.setState(
             {
               p1 : {id: this.state.p1.id, selected : true, port : p1},
-              p2 : this.state.p2
+              p2 : this.state.p2,
+              supported : this.supported
             }
           )
 
@@ -79,7 +103,8 @@ class App extends Component{
           this.setState(
             {
               p1 : this.state.p1,
-              p2 : {id: this.state.p2.id, selected : true, port : p2}
+              p2 : {id: this.state.p2.id, selected : true, port : p2},
+              supported : this.supported
             }
           )
 
@@ -107,15 +132,24 @@ class App extends Component{
 
   prepareComPortSelectButtons(){
     console.log("Create Message box")
-
-    if(this.state.p1.selected === false)
+    if(this.state.supported){
+      if(this.state.p1.selected === false)
       return(
         <div className='parentMessageBox'>
             <div className='messageBoxSelectButton' onClick={this.selectCom1} key="c1"/>
         </div>  
         )
-    else
-      return null;
+      else
+        return null;
+    }else{
+      return(
+        <div>
+          <div className='warningMessageBox'>
+          </div>  
+        </div>
+        )
+    }
+    
   }
 
 

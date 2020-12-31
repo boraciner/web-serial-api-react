@@ -20,3 +20,31 @@
 }
 
 
+.warningMessageBox{
+  background: url("images/warning_window.png");
+  width: 454px;
+  height: 263px;
+  margin: auto;
+  background-repeat: no-repeat;
+  margin-top: 200px;
+}
+
+.warningSettingsButton{
+  background: url("./images/settings-button-n.png");
+  background-repeat: no-repeat;
+  position: relative;
+  width: 164px;
+  height: 107px;
+  margin: auto;
+  top: 160px;
+}
+
+.warningSettingsButton:hover{
+  background: url("./images/settings-button-h.png");
+}
+
+
+.warningSettingsButton:active{
+  background: url("./images/settings-button-click.png");
+}
+
