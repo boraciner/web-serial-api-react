@@ -247,8 +247,13 @@ class DeviceState extends Component{
 
         console.log("Port..",this.props.port)
         const p_Port = this.props.port
-
-        await p_Port.port.open({ baudRate: 115200});
+        try{
+            await p_Port.port.open({ baudRate: 115200});
+        }catch(e){
+            p_Port.port.close();
+            await p_Port.port.open({ baudRate: 115200});
+        }
+        
         this.portReader = p_Port.port.readable.getReader();
 
         this.portWriter = p_Port.port.writable.getWriter();
