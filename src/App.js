@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import DeviceState from './components/DeviceState/DeviceState'
 import Grid from '@material-ui/core/Grid';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Header from "./components/Header/Header"
 import Contact from "./components/Contact/Contact"
 import About from "./components/About/About"
@@ -132,6 +132,20 @@ class App extends Component{
   }
 
 
+  tryToCloseComPort(){
+    try{
+      if(this.state.p1.selected === true){
+        try {
+           this.state.p1.port.close();
+        } catch (e) {
+        }
+        
+    }
+    }catch(err){
+      console.error(err)  
+    }
+  }
+
   prepareComPortSelectButtons(){
     console.log("Create Message box")
     if(this.state.supported){
@@ -159,16 +173,17 @@ class App extends Component{
     console.log("render....")
   return (
     <div >
+      
+      <BrowserRouter>
       <Header/>
-      <Router>
       <Switch>
-        <Route path="/contact">
+        <Route exact path="/contact">
           <Contact />
         </Route>
-        <Route path="/about">
+        <Route exact path="/about">
           <About />
         </Route>
-        <Route  path="/index">
+        <Route exact path="/index">
           {this.prepareComPortSelectButtons()}
           <Grid container justify='center'>
             <Grid item xs={12}>
@@ -179,7 +194,7 @@ class App extends Component{
           </Grid>
         </Route>
       </Switch>
-      </Router>
+      </BrowserRouter>
     </div>
   );
 }

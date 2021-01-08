@@ -2,6 +2,7 @@ import React from "react";
 import SlideToggle from "react-slide-toggle";
 import './Header.css'
 
+import { Link ,BrowserRouter} from 'react-router-dom';
 
 
 
@@ -39,9 +40,9 @@ export default function Header() {
         <div className="my-collapsible__content" ref={setCollapsibleElement}>
           <div className="my-collapsible__content-inner">
           <div className='navContent'>
-            |<a href="index">Testing</a> | 
-            <a href="about">About</a> | 
-            <a href="contact">Contact</a>
+            <Link to="index">Testing</Link> | 
+            <Link to="about">About</Link> | 
+            <Link to="contact">Contact</Link>
           </div>
           </div>
         </div>
