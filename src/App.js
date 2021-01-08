@@ -3,23 +3,11 @@ import DeviceState from './components/DeviceState/DeviceState'
 import Grid from '@material-ui/core/Grid';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Header from "./components/Header/Header"
+import Contact from "./components/Contact/Contact"
+import About from "./components/About/About"
 import './App.css';
 
-const Contact = props => {
-  return(
-      <div>
-        Contact Page
-      </div>
-    )
-}
 
-/*
-const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-const isOpera = (!!window.opr) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-const isFirefox = typeof InstallTrigger !== 'undefined';
-const isIE = false || !!document.documentMode;
-const isEdge = !isIE && !!window.StyleMedia;
-*/
 
 
 class App extends Component{
@@ -177,7 +165,10 @@ class App extends Component{
         <Route path="/contact">
           <Contact />
         </Route>
-        <Route>
+        <Route path="/about">
+          <About />
+        </Route>
+        <Route  path="/index">
           {this.prepareComPortSelectButtons()}
           <Grid container justify='center'>
             <Grid item xs={12}>

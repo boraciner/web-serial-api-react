@@ -1,0 +1,16 @@
+
+.blinker {
+    opacity: 1;
+    margin-bottom: -2px;
+    height: 15px;
+    margin-left: -5px;
+    border-left: 7px solid #94FFB8;
+    animation: blinker 0.9s steps(2, start) infinite;
+  }
+  
+  @keyframes blinker {
+    to { 
+      visibility: hidden; 
+    }
+  }
+  
