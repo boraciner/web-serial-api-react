@@ -44,18 +44,18 @@ class DeviceState extends Component{
     }
     initializePEVStrings(){
         this.pevStrings = [
-            {details : "PIB image reading completed OK",display : "PIB image reading completed OK",found : false,warning : false},
+            //{details : "PIB image reading completed OK",display : "PIB image reading completed OK",found : false,warning : false},
             {details : "CM_SLAC_PARAM.REQ sent",display : "CM_SLAC_PARAM.REQ sent",found : false,warning : false},
             {details : "CM_SLAC_PARAM.CNF received",display : "CM_SLAC_PARAM.CNF received",found : false,warning : false},
             {details : "CM_START_ATTEN_CHAR.IND sent",display : "CM_START_ATTEN_CHAR.IND sent",found : false,warning : false},
             {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false,warning : false},
             {details : "CM_ATTEN_CHAR.IND received",display : "CM_ATTEN_CHAR.IND received",found : false,warning : false},
             {details : "CM_ATTEN_CHAR.RSP sent",display : "CM_ATTEN_CHAR.RSP sent",found : false,warning : false},
-            {details : "CM_VALIDATE.REQ sent",display : "CM_VALIDATE.REQ sent",found : false,warning : false},
-            {details : "CM_VALIDATE.CNF received. -Charger Ready-",display : "Charger Ready",found : false,warning : false},	
-            {details : "CM_VALIDATE.CNF received. -Charger Success-",display : "Charger Success",found : false,warning : false},	
-            {details : "CM_SET_KEY.CNF received",display : "CM_SET_KEY.CNF received",found : false,warning : false},	
-            {details : "New keys set",display : "New keys set",found : false,warning : false},	
+            {details : "CM_SLAC_MATCH.REQ sent",display : "CM_SLAC_MATCH.REQ sent",found : false,warning : false},
+            {details : "CM_SLAC_MATCH.CNF received",display : "CM_SLAC_MATCH.CNF received",found : false,warning : false},	
+            //{details : "Keys are Set",display : "Keys are Set",found : false,warning : false},	
+            //{details : "CM_SET_KEY.CNF received",display : "CM_SET_KEY.CNF received",found : false,warning : false},	
+            //{details : "New keys set",display : "New keys set",found : false,warning : false},	
             {details : "Link Measurement:",display : "Link Measurement:",found : false,warning : false},	
             {details : "Sending IPv6.",display : "Sending IPv6.",found : false,warning : false},	
             {details : "IPv6 Message is received",display : "IPv6 Message is received",found : false,warning : false},	
@@ -72,9 +72,9 @@ class DeviceState extends Component{
         console.log("setTimedoutStartCommand | begin")
         this.timeoutStartInterval = setInterval(() => {
             if(timeoutStartCounter-- > 3){
-                this.pevStrings[16].display = "Reconnecting in "+timeoutStartCounter+" sec(s)."  
-                this.pevStrings[16].found = true 
-                console.log("setTimedoutStartCommand | set text to ",this.pevStrings[16].display)
+                this.pevStrings[12].display = "Reconnecting in "+timeoutStartCounter+" sec(s)."  
+                this.pevStrings[12].found = true 
+                console.log("setTimedoutStartCommand | set text to ",this.pevStrings[12].display)
                 this.setState({  
                     printOutCom : this.printOutCom,
                     toggleToRefresh : !this.state.toggleToRefresh,
@@ -85,7 +85,7 @@ class DeviceState extends Component{
                 })
             }
             else{
-                this.pevStrings[16].found = false
+                this.pevStrings[12].found = false
                 console.log("setTimedoutStartCommand | SEND start")
                 this.pevSendStartCommand();
                 this.setState({  
@@ -106,9 +106,9 @@ class DeviceState extends Component{
         var timeoutStopCounter = timerValue
         this.timeoutStopInterval = setInterval(() => {
             if(timeoutStopCounter-- > 0){
-                this.pevStrings[15].display = "Disconnecting in "+timeoutStopCounter+" sec(s)."
-                this.pevStrings[15].found = true
-                console.log("setInterval | set text to ",this.pevStrings[15].display)
+                this.pevStrings[11].display = "Disconnecting in "+timeoutStopCounter+" sec(s)."
+                this.pevStrings[11].found = true
+                console.log("setInterval | set text to ",this.pevStrings[11].display)
                 this.setState({  
                     printOutCom : this.printOutCom,
                     toggleToRefresh : !this.state.toggleToRefresh,
@@ -121,7 +121,7 @@ class DeviceState extends Component{
             else{
                 console.log("setInterval | SEND Stop")
                 this.pevSendStopCommand();
-                this.pevStrings[15].found = false
+                this.pevStrings[11].found = false
                 this.setTimedoutStartCommand(20);
                 clearInterval( this.timeoutStopInterval );
             }
@@ -164,23 +164,20 @@ class DeviceState extends Component{
                             this.pevStrings[i].found = true
                             nowFound = true
                             //console.log("ProcessSplittedCommand sCommand i=", i)
-                            if(i === 12)//Link Measurement
+                            if(i === 8)//Link Measurement
                             {
                                 
                                 let measurementValue = sCommand.split(':')
                                 if(measurementValue.length>1){
-                                    this.pevStrings[12].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
+                                    this.pevStrings[8].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
                                     this.linkMeasurements.push(measurementValue[1].trim())
                                 }
                             }
-                            else if(i === 13 && this.state.continuousTest === true)// IPv6 Message
+                            else if(i === 10 && this.state.continuousTest === true)// IPv6 Message
                             {
                                 //setTimeout(()=>{this.pevSendStopCommand()},15000);
                                 this.setTimedoutStopCommand(15);
-                            }else if(i === 0 && this.state.continuousTest === true)// PIB image reading completed OK
-                            {
-                                //setTimeout(()=>{this.pevSendStartCommand()},5000);
-                            }else if(i === 15)// TIMEOUT
+                            }else if(i === 11)// TIMEOUT
                             {
                                 console.warn("ProcessSplittedCommand  | this.linkMeasurements.push(Timeout) ")
                                 this.linkMeasurements.push("Timeout")
@@ -195,7 +192,7 @@ class DeviceState extends Component{
 
                     if(nowFound === true){
                         console.warn("OKKKKKKKK")
-                        let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-1)) * 100)
+                        let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-2)) * 100)
                         if(percCalc >= 90)
                             percCalc = 100;
                         
