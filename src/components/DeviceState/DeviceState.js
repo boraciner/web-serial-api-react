@@ -71,9 +71,10 @@ class DeviceState extends Component{
         var timeoutStartCounter = timerValue
         console.log("setTimedoutStartCommand | begin")
         this.timeoutStartInterval = setInterval(() => {
-            if(timeoutStartCounter-- > 3){
+            if(timeoutStartCounter-- > 1){
                 this.pevStrings[12].display = "Reconnecting in "+timeoutStartCounter+" sec(s)."  
                 this.pevStrings[12].found = true 
+                this.pevStrings[12].warning = true 
                 console.log("setTimedoutStartCommand | set text to ",this.pevStrings[12].display)
                 this.setState({  
                     printOutCom : this.printOutCom,
