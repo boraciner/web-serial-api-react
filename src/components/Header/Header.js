@@ -40,7 +40,8 @@ export default function Header() {
         <div className="my-collapsible__content" ref={setCollapsibleElement}>
           <div className="my-collapsible__content-inner">
           <div className='navContent'>
-            <Link to="index">Testing</Link> | 
+            <Link to="ccs">CCS</Link> | 
+            <Link to="chademo">ChadeMo</Link> | 
             <Link to="about">About</Link> | 
             <Link to="contact">Contact</Link>
           </div>

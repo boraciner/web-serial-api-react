@@ -11,6 +11,7 @@ class DeviceState extends Component{
         console.log("Send Start Command")
         const data = new Uint8Array([32]); // space
             this.portWriter.write(data).then(res=>{
+                console.error("Write ' ' for start... ")
             });
         this.setState({  printOutCom : this.printOutCom,
             toggleToRefresh : this.toggleToRefresh,
@@ -26,9 +27,11 @@ class DeviceState extends Component{
 
     pevSendStopCommand(){
         const data = new Uint8Array([100]); // d
+        
         this.portWriter.write(data).then(res=>{
+            console.error("Write 'd' for disconnect... ")
         });
-
+        this.rawData = ""
         clearInterval( this.timeoutStartInterval );
         clearInterval( this.timeoutStopInterval );
 
@@ -44,23 +47,19 @@ class DeviceState extends Component{
     }
     initializePEVStrings(){
         this.pevStrings = [
-            //{details : "PIB image reading completed OK",display : "PIB image reading completed OK",found : false,warning : false},
-            {details : "CM_SLAC_PARAM.REQ sent",display : "CM_SLAC_PARAM.REQ sent",found : false,warning : false},
-            {details : "CM_SLAC_PARAM.CNF received",display : "CM_SLAC_PARAM.CNF received",found : false,warning : false},
-            {details : "CM_START_ATTEN_CHAR.IND sent",display : "CM_START_ATTEN_CHAR.IND sent",found : false,warning : false},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false,warning : false},
-            {details : "CM_ATTEN_CHAR.IND received",display : "CM_ATTEN_CHAR.IND received",found : false,warning : false},
-            {details : "CM_ATTEN_CHAR.RSP sent",display : "CM_ATTEN_CHAR.RSP sent",found : false,warning : false},
-            {details : "CM_SLAC_MATCH.REQ sent",display : "CM_SLAC_MATCH.REQ sent",found : false,warning : false},
-            {details : "CM_SLAC_MATCH.CNF received",display : "CM_SLAC_MATCH.CNF received",found : false,warning : false},	
-            //{details : "Keys are Set",display : "Keys are Set",found : false,warning : false},	
-            //{details : "CM_SET_KEY.CNF received",display : "CM_SET_KEY.CNF received",found : false,warning : false},	
-            //{details : "New keys set",display : "New keys set",found : false,warning : false},	
-            {details : "Link Measurement:",display : "Link Measurement:",found : false,warning : false},	
-            {details : "Sending IPv6.",display : "Sending IPv6.",found : false,warning : false},	
-            {details : "IPv6 Message is received",display : "IPv6 Message is received",found : false,warning : false},	
-            {details : "TIMEOUT",display : "Timeout Occured",found : false,warning : true},	
-            {details : "TIMEOUT FOR CONNECT",display : "Timeout To Reconnect",found : false,warning : false},	
+            {details : "CM_SLAC_PARAM.REQ sent",display : "CM_SLAC_PARAM.REQ sent",found : false,warning : "false"},
+            {details : "CM_SLAC_PARAM.CNF received",display : "CM_SLAC_PARAM.CNF received",found : false,warning : "false"},
+            {details : "CM_START_ATTEN_CHAR.IND sent",display : "CM_START_ATTEN_CHAR.IND sent",found : false,warning : "false"},
+            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false,warning : "false"},
+            {details : "CM_ATTEN_CHAR.IND received",display : "CM_ATTEN_CHAR.IND received",found : false,warning : "false"},
+            {details : "CM_ATTEN_CHAR.RSP sent",display : "CM_ATTEN_CHAR.RSP sent",found : false,warning : "false"},
+            {details : "CM_SLAC_MATCH.REQ sent",display : "CM_SLAC_MATCH.REQ sent",found : false,warning : "false"},
+            {details : "CM_SLAC_MATCH.CNF received",display : "CM_SLAC_MATCH.CNF received",found : false,warning : "false"},	
+            {details : "Link Measurement:",display : "Link Measurement:",found : false,warning : "false"},	
+            {details : "Sending IPv6.",display : "Sending IPv6.",found : false,warning : "false"},	
+            {details : "IPv6 Message is received",display : "IPv6 Message is received",found : false,warning : "false"},	
+            {details : "TIMEOUT",display : "Timeout Occured",found : false,warning : "red"},	
+            {details : "TIMEOUT FOR CONNECT",display : "Timeout To Reconnect",found : false,warning : "red"},	
         ]
         
         
@@ -74,7 +73,7 @@ class DeviceState extends Component{
             if(timeoutStartCounter-- > 1){
                 this.pevStrings[12].display = "Reconnecting in "+timeoutStartCounter+" sec(s)."  
                 this.pevStrings[12].found = true 
-                this.pevStrings[12].warning = true 
+                this.pevStrings[12].warning = "green" 
                 console.log("setTimedoutStartCommand | set text to ",this.pevStrings[12].display)
                 this.setState({  
                     printOutCom : this.printOutCom,
@@ -109,6 +108,7 @@ class DeviceState extends Component{
             if(timeoutStopCounter-- > 0){
                 this.pevStrings[11].display = "Disconnecting in "+timeoutStopCounter+" sec(s)."
                 this.pevStrings[11].found = true
+                this.pevStrings[11].warning = "green"
                 console.log("setInterval | set text to ",this.pevStrings[11].display)
                 this.setState({  
                     printOutCom : this.printOutCom,
@@ -123,7 +123,7 @@ class DeviceState extends Component{
                 console.log("setInterval | SEND Stop")
                 this.pevSendStopCommand();
                 this.pevStrings[11].found = false
-                this.setTimedoutStartCommand(20);
+                this.setTimedoutStartCommand(25);
                 clearInterval( this.timeoutStopInterval );
             }
         }, 1000);
@@ -135,29 +135,11 @@ class DeviceState extends Component{
     }
 
     ProcessSplittedCommand(sCommand){
+        console.log("ProcessSplittedCommand " ,sCommand)
         if(sCommand.length > 5){
-            if(sCommand.includes("ROLE:PEV"))
+            if(sCommand.includes("PEER"))
             {
-                    this.role = "PEV";
-                    clearInterval(this.queryInterval);
-                    this.setState({  printOutCom : this.printOutCom,
-                                        toggleToRefresh : this.toggleToRefresh,
-                                        role : this.role  ,
-                                        percentage : this.state.percentage,
-                                        started : this.state.started,
-                                        continuousTest : this.state.continuousTest
-                                    })
-            }
-            else if(sCommand.includes("ROLE:EVSE"))
-            {
-                    this.role = "EVSE";
-                    clearInterval(this.queryInterval);
-                    this.setState({  printOutCom : this.printOutCom,
-                                        toggleToRefresh : this.toggleToRefresh,
-                                        role : this.role ,
-                                        percentage : this.state.percentage,
-                                        started : this.state.started,
-                                        continuousTest : this.state.continuousTest  })
+                //Just skip it
             }else{
                     let nowFound = false;
                     for(let i=0;i<this.pevStrings.length;i++){
@@ -174,7 +156,7 @@ class DeviceState extends Component{
                                     this.linkMeasurements.push(measurementValue[1].trim())
                                 }
                             }
-                            else if(i === 10 && this.state.continuousTest === true)// IPv6 Message
+                            else if(i === 10 && this.state.continuousTest === true)// IPv6 Message is received
                             {
                                 //setTimeout(()=>{this.pevSendStopCommand()},15000);
                                 this.setTimedoutStopCommand(15);
@@ -184,7 +166,7 @@ class DeviceState extends Component{
                                 this.linkMeasurements.push("Timeout")
                                 if(this.state.continuousTest === true)
                                 {
-                                    this.setTimedoutStopCommand(5);
+                                    this.setTimedoutStopCommand(10);
                                 }
                             }
                             break;
@@ -230,12 +212,13 @@ class DeviceState extends Component{
 
     ReadValues(){
         this.portReader.read().then(res=>{
-            console.log("VALUE ",res.value)
-            this.rawData += new TextDecoder("utf-8").decode(res.value)
-            console.log("rawData ",this.rawData)
-            
-            setTimeout(this.ProcessRawData(),0);
-            this.ReadValues();
+            this.rawData += new TextDecoder("utf-8").decode(res.value);
+            return this.rawData;
+            // setTimeout(this.ProcessRawData(),0);
+            // this.ReadValues();
+        }).then(val=>{
+            this.ProcessRawData()
+            this.ReadValues()
         });
     }
 
@@ -251,7 +234,7 @@ class DeviceState extends Component{
             p_Port.port.close();
             await p_Port.port.open({ baudRate: 115200});
         }
-        
+         
         this.portReader = p_Port.port.readable.getReader();
 
         this.portWriter = p_Port.port.writable.getWriter();
@@ -261,10 +244,7 @@ class DeviceState extends Component{
             this.ReadValues()
         },0)
 
-        const data = new Uint8Array([114]); // r
-        this.portWriter.write(data).then(res=>{
-        });
-        console.log("ask role")
+        
         
        
         console.log("OpenReadComPort | end")
@@ -335,10 +315,19 @@ class DeviceState extends Component{
             return this.pevStrings.map((value,index)=>{
                 if(value.found)
                 {
-                    if(value.warning === false){
+                    if(value.warning === "false"){
                         return(
                             <p key={"detailed_"+index}>
                                 {value.display}{index<15 ? ".......................................OK" : ""}
+                            </p>
+                        );
+                    }
+                    else if(value.warning === "green"){
+                        return(
+                            <p key={"detailed_"+index} style={{color:'#00cc00',
+                                                               textShadow: '0 0 0.4em #00cc00'
+                                                               }} id='greenTextFeature'>
+                                {value.display}
                             </p>
                         );
                     }

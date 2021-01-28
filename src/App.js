@@ -183,7 +183,10 @@ class App extends Component{
         <Route exact path="/about">
           <About />
         </Route>
-        <Route exact path="/index">
+        <Route exact path="/chademo">
+          <About />
+        </Route>
+        <Route exact path="/ccs">
           {this.prepareComPortSelectButtons()}
           <Grid container justify='center'>
             <Grid item xs={12}>

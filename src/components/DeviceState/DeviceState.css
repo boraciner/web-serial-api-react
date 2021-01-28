@@ -115,6 +115,18 @@ p{
   animation: warningTextAnim 1s ease infinite;
 }
 
+@keyframes greenTextAnim{
+  0%{     color: #00cc00;    }
+  49%{    color: #00cc00; }
+  60%{    color: transparent; }
+  99%{    color: transparent;  }
+  100%{   color: #00cc00;    }
+}
+#greenTextFeature{
+  opacity:1;
+  text-shadow: 0 0 .6em #00cc00;
+  animation: greenTextAnim 1s ease infinite;
+}
 
 
 
