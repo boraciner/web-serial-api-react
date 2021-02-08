@@ -60,6 +60,7 @@ class DeviceState extends Component{
             {details : "IPv6 Message is received",display : "IPv6 Message is received",found : false,warning : "false"},	
             {details : "TIMEOUT",display : "Timeout Occured",found : false,warning : "red"},	
             {details : "TIMEOUT FOR CONNECT",display : "Timeout To Reconnect",found : false,warning : "red"},	
+            {details : "Waiting for EVSE to be ready!",display : "Waiting for EVSE to be ready!",found : false,warning : "false"},
         ]
         
         
@@ -123,7 +124,16 @@ class DeviceState extends Component{
                 console.log("setInterval | SEND Stop")
                 this.pevSendStopCommand();
                 this.pevStrings[11].found = false
-                this.setTimedoutStartCommand(25);
+                //this.setTimedoutStartCommand(25);
+                this.pevStrings[13].found = true
+                this.setState({  
+                    printOutCom : this.printOutCom,
+                    toggleToRefresh : !this.state.toggleToRefresh,
+                    role : this.state.role  ,
+                    percentage : this.state.percentage,
+                    started : this.state.started,
+                    continuousTest : this.state.continuousTest
+                })
                 clearInterval( this.timeoutStopInterval );
             }
         }, 1000);
@@ -136,12 +146,19 @@ class DeviceState extends Component{
 
     ProcessSplittedCommand(sCommand){
         console.log("ProcessSplittedCommand " ,sCommand)
+        let nowFound = false;
+
         if(sCommand.length > 5){
-            if(sCommand.includes("PEER"))
+            if(sCommand.includes("PEER") && sCommand.includes("LOG - SLAC - CM_SET_KEY.CNF set."))
             {
-                //Just skip it
+                if(this.state.continuousTest === true)
+                {
+                    this.setTimedoutStartCommand(15)
+                    this.pevStrings[13].found = false
+                    nowFound = true
+                }
             }else{
-                    let nowFound = false;
+                    
                     for(let i=0;i<this.pevStrings.length;i++){
                         if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
                             this.pevStrings[i].found = true
@@ -149,7 +166,6 @@ class DeviceState extends Component{
                             //console.log("ProcessSplittedCommand sCommand i=", i)
                             if(i === 8)//Link Measurement
                             {
-                                
                                 let measurementValue = sCommand.split(':')
                                 if(measurementValue.length>1){
                                     this.pevStrings[8].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
@@ -159,14 +175,14 @@ class DeviceState extends Component{
                             else if(i === 10 && this.state.continuousTest === true)// IPv6 Message is received
                             {
                                 //setTimeout(()=>{this.pevSendStopCommand()},15000);
-                                this.setTimedoutStopCommand(15);
+                                this.setTimedoutStopCommand(10);
                             }else if(i === 11)// TIMEOUT
                             {
                                 console.warn("ProcessSplittedCommand  | this.linkMeasurements.push(Timeout) ")
                                 this.linkMeasurements.push("Timeout")
                                 if(this.state.continuousTest === true)
                                 {
-                                    this.setTimedoutStopCommand(10);
+                                    this.setTimedoutStopCommand(20);
                                 }
                             }
                             break;
@@ -316,11 +332,20 @@ class DeviceState extends Component{
                 if(value.found)
                 {
                     if(value.warning === "false"){
-                        return(
-                            <p key={"detailed_"+index}>
-                                {value.display}{index<15 ? ".......................................OK" : ""}
-                            </p>
-                        );
+                        if(index === 13){
+                            return(
+                                <p key={"detailed_"+index}>
+                                    {value.display}
+                                </p>
+                            );
+                        }else{
+                            return(
+                                <p key={"detailed_"+index}>
+                                    {value.display}{index<15 ? ".......................................OK" : ""}
+                                </p>
+                            );
+                        }
+                            
                     }
                     else if(value.warning === "green"){
                         return(
