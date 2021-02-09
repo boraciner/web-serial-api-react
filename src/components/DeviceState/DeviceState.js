@@ -191,7 +191,7 @@ class DeviceState extends Component{
 
                     if(nowFound === true){
                         console.warn("OKKKKKKKK")
-                        let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-2)) * 100)
+                        let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-3)) * 100)
                         if(percCalc >= 90)
                             percCalc = 100;
                         

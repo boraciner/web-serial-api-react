@@ -2,7 +2,7 @@ import React from "react";
 import SlideToggle from "react-slide-toggle";
 import './Header.css'
 
-import { Link ,BrowserRouter} from 'react-router-dom';
+import { Link} from 'react-router-dom';
 
 
 
