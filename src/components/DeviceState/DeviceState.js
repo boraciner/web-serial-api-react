@@ -153,7 +153,7 @@ class DeviceState extends Component{
             {
                 if(this.state.continuousTest === true)
                 {
-                    this.setTimedoutStartCommand(15)
+                    this.setTimedoutStartCommand(25)
                     this.pevStrings[13].found = false
                     nowFound = true
                 }
