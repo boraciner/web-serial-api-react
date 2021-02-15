@@ -14,7 +14,7 @@ export default function Header() {
         <div className="topCover"></div>
           <div className="headerContent">
             <div className="headerLinks">
-            <h1>WEB SERIAL API</h1>
+            <h1>WEBSERIAL API</h1>
                 <div className="signLinks">
                 <h3>Test Web Interface</h3>
                 </div>       

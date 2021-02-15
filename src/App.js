@@ -1,11 +1,12 @@
 import React, {Component} from "react";
-import DeviceState from './components/DeviceState/DeviceState'
+import CCSPage from './components/CCSPage/CCSPage'
 import Grid from '@material-ui/core/Grid';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Header from "./components/Header/Header"
 import Contact from "./components/Contact/Contact"
 import About from "./components/About/About"
 import './App.css';
+import ChademoPage from "./components/ChademoPage/ChademoPage";
 
 
 
@@ -184,14 +185,21 @@ class App extends Component{
           <About />
         </Route>
         <Route exact path="/chademo">
-          <About />
+        {this.prepareComPortSelectButtons()}
+          <Grid container justify='center'>
+            <Grid item xs={12}>
+              <div>
+                {this.state.p1.selected === true ? <ChademoPage port={this.state.p1}/ > : null}
+              </div>
+            </Grid>
+          </Grid>
         </Route>
         <Route exact path="/ccs">
           {this.prepareComPortSelectButtons()}
           <Grid container justify='center'>
             <Grid item xs={12}>
               <div>
-                {this.state.p1.selected === true ? <DeviceState port={this.state.p1}/ > : null}
+                {this.state.p1.selected === true ? <CCSPage port={this.state.p1}/ > : null}
               </div>
             </Grid>
           </Grid>

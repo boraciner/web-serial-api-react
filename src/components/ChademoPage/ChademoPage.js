@@ -1,13 +1,14 @@
 import React,{Component} from 'react'
 import { createMuiTheme, responsiveFontSizes} from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import './DeviceState.css'
+import './ChademoPage.css'
 
 
-class DeviceState extends Component{
+class ChademoPage extends Component{
 
     
     pevSendStartCommand(){
+        this.initializePEVStrings()
         console.log("Send Start Command")
         const data = new Uint8Array([32]); // space
             this.portWriter.write(data).then(res=>{
@@ -25,42 +26,24 @@ class DeviceState extends Component{
 
     }
 
-    pevSendStopCommand(){
-        const data = new Uint8Array([100]); // d
-        
-        this.portWriter.write(data).then(res=>{
-            console.error("Write 'd' for disconnect... ")
-        });
-        this.rawData = ""
-        clearInterval( this.timeoutStartInterval );
-        clearInterval( this.timeoutStopInterval );
-
-        this.initializePEVStrings();
-        this.setState({  
-            printOutCom : this.printOutCom,
-            toggleToRefresh : true,
-            role : this.role,
-            percentage : 0,
-            started : false,
-            continuousTest : this.state.continuousTest
-        })
-    }
+    
     initializePEVStrings(){
         this.pevStrings = [
-            {details : "CM_SLAC_PARAM.REQ sent",display : "CM_SLAC_PARAM.REQ sent",found : false,warning : "false"},
-            {details : "CM_SLAC_PARAM.CNF received",display : "CM_SLAC_PARAM.CNF received",found : false,warning : "false"},
-            {details : "CM_START_ATTEN_CHAR.IND sent",display : "CM_START_ATTEN_CHAR.IND sent",found : false,warning : "false"},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false,warning : "false"},
-            {details : "CM_ATTEN_CHAR.IND received",display : "CM_ATTEN_CHAR.IND received",found : false,warning : "false"},
-            {details : "CM_ATTEN_CHAR.RSP sent",display : "CM_ATTEN_CHAR.RSP sent",found : false,warning : "false"},
-            {details : "CM_SLAC_MATCH.REQ sent",display : "CM_SLAC_MATCH.REQ sent",found : false,warning : "false"},
-            {details : "CM_SLAC_MATCH.CNF received",display : "CM_SLAC_MATCH.CNF received",found : false,warning : "false"},	
-            {details : "Link Measurement:",display : "Link Measurement:",found : false,warning : "false"},	
-            {details : "Sending IPv6.",display : "Sending IPv6.",found : false,warning : "false"},	
-            {details : "IPv6 Message is received",display : "IPv6 Message is received",found : false,warning : "false"},	
-            {details : "TIMEOUT",display : "Timeout Occured",found : false,warning : "red"},	
-            {details : "TIMEOUT FOR CONNECT",display : "Timeout To Reconnect",found : false,warning : "red"},	
-            {details : "Waiting for EVSE to be ready!",display : "Waiting for EVSE to be ready!",found : false,warning : "false"},
+            {details : "Event | Detected | t0",display : "EVSE | Detected | t0",found : false,warning : "false"},
+            {details : "Event | Set | t1",display : "EVSE | Set | t1",found : false,warning : "false"},
+            {details : "Event | Detected | t1",display : "PEV | Detected | t1",found : false,warning : "false"},
+            {details : "Event | Set | t2",display : "PEV | Set | t2",found : false,warning : "false"},
+            {details : "Event | Detected | t2",display : " EVSE | Detected | t2",found : false,warning : "false"},
+            {details : "Event | Set | t3",display : "EVSE | Set | t3",found : false,warning : "false"},
+            {details : "Event | Detected | t3",display : "PEV | Detected | t3",found : false,warning : "false"},
+            {details : "Event | Message Exchange | Sending",display : "CAN Message | Sending",found : false,warning : "false"},
+            {details : "Event | Message Exchange | Received",display : "CAN Message | Received",found : false,warning : "false"},
+            {details : "Event | Set | t4",display : "PEV | Set | t4",found : false,warning : "false"},	
+            {details : "Event | Detected | t4",display : "EVSE | Detected | t4",found : false,warning : "false"},	
+            {details : "Event | Set | t5",display : "EVSE | Set | t5",found : false,warning : "false"},	
+            {details : "Event | Set | t6",display : "EVSE | Set | t6",found : false,warning : "false"},	
+            {details : "Event | Set | t7",display : "EVSE | Set | t7",found : false,warning : "false"},
+            {details : "Event | Set | t7",display : "EVSE | Set | t7",found : false,warning : "false"},
         ]
         
         
@@ -72,9 +55,9 @@ class DeviceState extends Component{
         console.log("setTimedoutStartCommand | begin")
         this.timeoutStartInterval = setInterval(() => {
             if(timeoutStartCounter-- > 1){
-                this.pevStrings[12].display = "Reconnecting in "+timeoutStartCounter+" sec(s)."  
-                this.pevStrings[12].found = true 
-                this.pevStrings[12].warning = "green" 
+                this.pevStrings[14].display = "Reconnecting in "+timeoutStartCounter+" sec(s)."  
+                this.pevStrings[14].found = true 
+                this.pevStrings[14].warning = "green" 
                 console.log("setTimedoutStartCommand | set text to ",this.pevStrings[12].display)
                 this.setState({  
                     printOutCom : this.printOutCom,
@@ -86,7 +69,7 @@ class DeviceState extends Component{
                 })
             }
             else{
-                this.pevStrings[12].found = false
+                this.pevStrings[14].found = false
                 console.log("setTimedoutStartCommand | SEND start")
                 this.pevSendStartCommand();
                 this.setState({  
@@ -103,41 +86,7 @@ class DeviceState extends Component{
     }
 
 
-    setTimedoutStopCommand(timerValue){
-        var timeoutStopCounter = timerValue
-        this.timeoutStopInterval = setInterval(() => {
-            if(timeoutStopCounter-- > 0){
-                this.pevStrings[11].display = "Disconnecting in "+timeoutStopCounter+" sec(s)."
-                this.pevStrings[11].found = true
-                this.pevStrings[11].warning = "green"
-                console.log("setInterval | set text to ",this.pevStrings[11].display)
-                this.setState({  
-                    printOutCom : this.printOutCom,
-                    toggleToRefresh : !this.state.toggleToRefresh,
-                    role : this.state.role  ,
-                    percentage : this.state.percentage,
-                    started : true,
-                    continuousTest : this.state.continuousTest
-                })
-            }
-            else{
-                console.log("setInterval | SEND Stop")
-                this.pevSendStopCommand();
-                this.pevStrings[11].found = false
-                //this.setTimedoutStartCommand(25);
-                this.pevStrings[13].found = true
-                this.setState({  
-                    printOutCom : this.printOutCom,
-                    toggleToRefresh : !this.state.toggleToRefresh,
-                    role : this.state.role  ,
-                    percentage : this.state.percentage,
-                    started : this.state.started,
-                    continuousTest : this.state.continuousTest
-                })
-                clearInterval( this.timeoutStopInterval );
-            }
-        }, 1000);
-    }
+    
   
   
     componentDidMount(){
@@ -149,68 +98,39 @@ class DeviceState extends Component{
         let nowFound = false;
 
         if(sCommand.length > 5){
-            if(sCommand.includes("PEER") && sCommand.includes("LOG - SLAC - CM_SET_KEY.CNF set."))
-            {
-                if(this.state.continuousTest === true)
-                {
-                    this.setTimedoutStartCommand(25)
-                    this.pevStrings[13].found = false
+            for(let i=0;i<this.pevStrings.length;i++){
+                if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
+                    this.pevStrings[i].found = true
                     nowFound = true
-                }
-            }else{
-                    
-                    for(let i=0;i<this.pevStrings.length;i++){
-                        if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
-                            this.pevStrings[i].found = true
-                            nowFound = true
-                            //console.log("ProcessSplittedCommand sCommand i=", i)
-                            if(i === 8)//Link Measurement
-                            {
-                                let measurementValue = sCommand.split(':')
-                                if(measurementValue.length>1){
-                                    this.pevStrings[8].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
-                                    this.linkMeasurements.push(measurementValue[1].trim())
-                                }
-                            }
-                            else if(i === 10 && this.state.continuousTest === true)// IPv6 Message is received
-                            {
-                                //setTimeout(()=>{this.pevSendStopCommand()},15000);
-                                this.setTimedoutStopCommand(10);
-                            }else if(i === 11)// TIMEOUT
-                            {
-                                console.warn("ProcessSplittedCommand  | this.linkMeasurements.push(Timeout) ")
-                                this.linkMeasurements.push("Timeout")
-                                if(this.state.continuousTest === true)
-                                {
-                                    this.setTimedoutStopCommand(20);
-                                }
-                            }
-                            break;
+                    if(i === 13)//Event | Set | t7
+                    {
+                        if(this.state.continuousTest === true)
+                        {
+                            this.setTimedoutStartCommand(5)
                         }
                     }
-
-                    if(nowFound === true){
-                        console.warn("OKKKKKKKK")
-                        let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-3)) * 100)
-                        if(percCalc >= 90)
-                            percCalc = 100;
-                        
-                        percCalc = Math.round(percCalc)
-
-                        this.setState({  
-                            printOutCom : this.printOutCom,
-                            toggleToRefresh : !this.state.toggleToRefresh,
-                            role : this.role  ,
-                            percentage : percCalc,
-                            started : true,
-                            continuousTest : this.state.continuousTest
-                        })
-                    }
+                    break;
+                }
             }
-        }
-        
 
-                       
+            if(nowFound === true){
+                console.warn("OKKKKKKKK")
+                let percCalc = this.state.percentage + ((1 / (this.pevStrings.length)) * 100)
+                if(percCalc >= 90)
+                    percCalc = 100;
+                
+                percCalc = Math.round(percCalc)
+
+                this.setState({  
+                    printOutCom : this.printOutCom,
+                    toggleToRefresh : !this.state.toggleToRefresh,
+                    role : this.role  ,
+                    percentage : percCalc,
+                    started : true,
+                    continuousTest : this.state.continuousTest
+                })
+            }
+        }  
     }
 
 
@@ -298,7 +218,6 @@ class DeviceState extends Component{
         this.queryInterval = {}
         this.initializePEVStrings()
         this.pevSendStartCommand = this.pevSendStartCommand.bind(this)
-        this.pevSendStopCommand = this.pevSendStopCommand.bind(this)
         this.handleContToggleSwitch = this.handleContToggleSwitch.bind(this)
         this.showDetailedProgress = this.showDetailedProgress.bind(this)
         this.showLinkPanel = this.showLinkPanel.bind(this)
@@ -307,7 +226,6 @@ class DeviceState extends Component{
         this.linkMeasurements = []
         
         this.timeoutStartInterval = {}
-        this.timeoutStopInterval = {}
         
 
     }
@@ -332,20 +250,11 @@ class DeviceState extends Component{
                 if(value.found)
                 {
                     if(value.warning === "false"){
-                        if(index === 13){
-                            return(
-                                <p key={"detailed_"+index}>
-                                    {value.display}
-                                </p>
-                            );
-                        }else{
-                            return(
-                                <p key={"detailed_"+index}>
-                                    {value.display}{index<15 ? ".......................................OK" : ""}
-                                </p>
-                            );
-                        }
-                            
+                        return(
+                            <p key={"detailed_"+index}>
+                                {value.display}{index<15 ? "................OK" : ""}
+                            </p>
+                        );
                     }
                     else if(value.warning === "green"){
                         return(
@@ -450,9 +359,6 @@ class DeviceState extends Component{
                     <Grid item xs={2}>
                     <div className='Action_button_1' onClick={this.pevSendStartCommand}/>
                     </Grid>
-                    <Grid item xs={2}>
-                    <div className='Action_button_2' onClick={this.pevSendStopCommand}/>
-                    </Grid>
                     <Grid item xs={2} >
                         <div style={{marginTop: '20px'}}>
                             <span className='continuousText'>Continuous Test</span>
@@ -500,4 +406,4 @@ class DeviceState extends Component{
 */
 
 }
-export default DeviceState
+export default ChademoPage
