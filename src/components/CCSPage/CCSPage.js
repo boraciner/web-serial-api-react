@@ -80,7 +80,8 @@ class CCSPage extends Component{
             {details : "Waiting for EVSE to be ready!",display : "Waiting for EVSE to be ready!",found : false,warning : "false"},
             {details : "wrong protocol for pev",display : "Wrong protocol is detected on PEV side",found : false,warning : "red"},	
             {details : "wrong protocol for evse",display : "Wrong protocol is detected on EVSE side",found : false,warning : "red"},
-            {details : "System is not completed, Power ON Evse Simulator",display : "System is not completed, Power ON Evse Simulator",found : false,warning : "red"},		
+            {details : "System is not completed, Power ON Evse Simulator",display : "System is not completed, Power ON Evse Simulator",found : false,warning : "red"},	
+            {details : "Power On PEV and Restart the Page",display : "Power On PEV and Restart the Page",found : false,warning : "red"},		
         ]
         
         
@@ -193,31 +194,19 @@ class CCSPage extends Component{
         
         let nowFound = false;
         if(sCommand.length > 5){
-            
+            console.log("sCommand ",sCommand)
             if(sCommand.includes("PEER"))
             {
-                if(sCommand.includes("Protocol") && sCommand.includes("hpg_state")){
-                    let foundProtocol =""
+                this.pevStrings[16].found = false
+                this.peerMessageRcvTimestamp = Date.now()
+                if(sCommand.includes("Protocol")){
+                    let foundProtocol ="Chademo"
                     if(!sCommand.includes("PLC")){
                         this.pevStrings[15].found = true
                     }else{
                         foundProtocol = "PLC"
                         this.pevStrings[15].found = false
                     }
-
-                    let retObj = this.ExtractDeviceStatus_HpgState(sCommand)
-                    if (isNaN(retObj.deviceState))
-                    {
-                        retObj.deviceState = this.state.evseDeviceState
-                    }
-
-                    if (isNaN(retObj.hpgState))
-                    {
-                        retObj.hpgState = this.state.evseHpgState
-                    }
-
-                    this.pevStrings[16].found = false
-                    this.peerMessageRcvTimestamp = Date.now()
 
                     this.setState({  
                         printOutCom : this.printOutCom,
@@ -230,6 +219,33 @@ class CCSPage extends Component{
                         pevDeviceState : this.state.pevDeviceState,
                         pevHpgState : this.state.pevHpgState,
                         evseProtocol : foundProtocol,
+                        evseDeviceState : this.state.evseDeviceState,
+                        evseHpgState : this.state.evseHpgState,
+                        timeoutFound : this.state.timeoutFound
+                    })
+                }    
+                if(sCommand.includes("hpg_state")){
+                    let retObj = this.ExtractDeviceStatus_HpgState(sCommand)
+                    if (isNaN(retObj.deviceState))
+                    {
+                        retObj.deviceState = this.state.pevDeviceState
+                    }
+                    if (isNaN(retObj.hpgState))
+                    {
+                        retObj.hpgState = this.state.pevHpgState
+                    }
+
+                    this.setState({  
+                        printOutCom : this.printOutCom,
+                        toggleToRefresh : !this.state.toggleToRefresh,
+                        role : this.state.role  ,
+                        percentage : this.state.percentage,
+                        started : this.state.started,
+                        continuousTest : this.state.continuousTest,
+                        pevProtocol : this.state.pevProtocol,
+                        pevDeviceState : this.state.pevDeviceState,
+                        pevHpgState : this.state.pevHpgState,
+                        evseProtocol : this.state.evseProtocol,
                         evseDeviceState : retObj.deviceState,
                         evseHpgState : retObj.hpgState,
                         timeoutFound : this.state.timeoutFound
@@ -245,8 +261,8 @@ class CCSPage extends Component{
                     }
                 }
             }else{
-                if(sCommand.includes("Protocol") && sCommand.includes("hpg_state")){
-                    let foundProtocol =""
+                if(sCommand.includes("Protocol")){
+                    let foundProtocol ="Chademo"
                     if(!sCommand.includes("PLC")){
                         this.pevStrings[14].found = true
                     }else{
@@ -254,12 +270,28 @@ class CCSPage extends Component{
                         this.pevStrings[14].found = false
                     }
 
+                    this.setState({  
+                        printOutCom : this.printOutCom,
+                        toggleToRefresh : !this.state.toggleToRefresh,
+                        role : this.state.role  ,
+                        percentage : this.state.percentage,
+                        started : this.state.started,
+                        continuousTest : this.state.continuousTest,
+                        pevProtocol : foundProtocol,
+                        pevDeviceState : this.state.pevDeviceState,
+                        pevHpgState : this.state.pevHpgState,
+                        evseProtocol : this.state.evseProtocol,
+                        evseDeviceState : this.state.evseDeviceState,
+                        evseHpgState : this.state.evseHpgState,
+                        timeoutFound : this.state.timeoutFound
+                    })
+                }    
+                if(sCommand.includes("hpg_state")){
                     let retObj = this.ExtractDeviceStatus_HpgState(sCommand)
                     if (isNaN(retObj.deviceState))
                     {
                         retObj.deviceState = this.state.pevDeviceState
                     }
-
                     if (isNaN(retObj.hpgState))
                     {
                         retObj.hpgState = this.state.pevHpgState
@@ -272,7 +304,7 @@ class CCSPage extends Component{
                         percentage : this.state.percentage,
                         started : this.state.started,
                         continuousTest : this.state.continuousTest,
-                        pevProtocol : foundProtocol,
+                        pevProtocol : this.state.pevProtocol,
                         pevDeviceState : retObj.deviceState,
                         pevHpgState : retObj.hpgState,
                         evseProtocol : this.state.evseProtocol,
@@ -280,10 +312,8 @@ class CCSPage extends Component{
                         evseHpgState : this.state.evseHpgState,
                         timeoutFound : this.state.timeoutFound
                     })
-                }    
-                else{
-                    console.log("ProcessSplittedCommand " ,sCommand)
                 }
+                
                 for(let i=0;i<this.pevStrings.length;i++){
                     if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
                         this.pevStrings[i].found = true
@@ -358,7 +388,42 @@ class CCSPage extends Component{
         
     }
 
-    ReadValues(){
+    async ReadValues(){
+
+        for(;;){
+            try{
+                let ret = await this.portReader.read();
+                this.connectionLost = false
+                this.rawData += new TextDecoder("utf-8").decode(ret.value);
+                this.ProcessRawData()
+                this.pevStrings[17].found = false;
+            }
+            catch(err){
+                console.error("READ VALUES ERROR " ,err)
+                this.connectionLost = true
+                this.pevStrings[17].found = true;
+
+                this.setState({  
+                    printOutCom : this.printOutCom,
+                    toggleToRefresh : !this.state.toggleToRefresh,
+                    role : this.state.role  ,
+                    percentage : this.state.percentage,
+                    started : this.state.started,
+                    continuousTest : this.state.continuousTest,
+                    pevProtocol : this.state.pevProtocol,
+                    pevDeviceState : -1,
+                    pevHpgState : -1,
+                    evseProtocol : this.state.evseProtocol,
+                    evseDeviceState : -1,
+                    evseHpgState : -1,
+                    timeoutFound : this.state.timeoutFound
+                })
+
+                break
+            }
+        }
+
+/*
         this.portReader.read().then(res=>{
             this.rawData += new TextDecoder("utf-8").decode(res.value);
             return this.rawData;
@@ -367,7 +432,8 @@ class CCSPage extends Component{
         }).then(val=>{
             this.ProcessRawData()
             this.ReadValues()
-        });
+        })
+        */
     }
 
     
@@ -394,13 +460,19 @@ class CCSPage extends Component{
         },0)
 
         this.gatheringInformationInterval = setInterval(() => { 
+            
+            if(this.connectionLost)
+                return
+
             const data = new Uint8Array([114]); // r
             this.portWriter.write(data).then(res=>{
                 //console.log("Send Information Command ",res)
             });
 
             const millis = Date.now() - this.peerMessageRcvTimestamp
-            if(millis > 10000 || (this.state.evseDeviceState === -1 && this.state.evseHpgState === -1)){
+            if(millis > 6000 || (this.state.evseDeviceState === -1 && this.state.evseHpgState === -1)){
+                console.error("Connection lost to EVSE")
+                this.initializePEVStrings()
                 this.pevStrings[16].found = true;
 
                 this.setState({  
@@ -413,7 +485,7 @@ class CCSPage extends Component{
                     pevProtocol : this.state.pevProtocol,
                     pevDeviceState : this.state.pevDeviceState,
                     pevHpgState : this.state.pevHpgState,
-                    evseProtocol : "",
+                    evseProtocol : this.state.evseProtocol,
                     evseDeviceState : -1,
                     evseHpgState : -1,
                     timeoutFound : this.state.timeoutFound
@@ -607,7 +679,7 @@ class CCSPage extends Component{
     }
     
     render(){
-        console.log("PEV ",this.state.pevDeviceState,this.state.pevHpgState," EVSE ",this.state.evseDeviceState,this.state.evseHpgState,"timeoutFound ",this.state.timeoutFound)
+        console.log("PEV ",this.state.pevProtocol, " --- ",this.state.pevDeviceState,this.state.pevHpgState," EVSE ",this.state.evseProtocol," --- ",this.state.evseDeviceState,this.state.evseHpgState,"timeoutFound ",this.state.timeoutFound)
         if(this.state.pevProtocol === "PLC" && this.state.evseProtocol === "PLC"){
             return (
                 <div>
