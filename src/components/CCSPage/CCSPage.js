@@ -18,7 +18,14 @@ class CCSPage extends Component{
             role : this.state.role  ,
             percentage : 0,
             started : true,
-            continuousTest : this.state.continuousTest
+            continuousTest : this.state.continuousTest,
+            pevProtocol : this.state.pevProtocol,
+            pevDeviceState : this.state.pevDeviceState,
+            pevHpgState : this.state.pevHpgState,
+            evseProtocol : this.state.evseProtocol,
+            evseDeviceState : this.state.evseDeviceState,
+            evseHpgState : this.state.evseHpgState,
+            timeoutFound : this.state.timeoutFound
         })
     }
     handleContToggleSwitch(event){
@@ -36,13 +43,23 @@ class CCSPage extends Component{
         clearInterval( this.timeoutStopInterval );
 
         this.initializePEVStrings();
+
+        this.pevStrings[13].found = true
+
         this.setState({  
             printOutCom : this.printOutCom,
             toggleToRefresh : true,
             role : this.role,
             percentage : 0,
             started : false,
-            continuousTest : this.state.continuousTest
+            continuousTest : this.state.continuousTest,
+            pevProtocol : this.state.pevProtocol,
+            pevDeviceState : this.state.pevDeviceState,
+            pevHpgState : this.state.pevHpgState,
+            evseProtocol : this.state.evseProtocol,
+            evseDeviceState : this.state.evseDeviceState,
+            evseHpgState : this.state.evseHpgState,
+            timeoutFound : false
         })
     }
     initializePEVStrings(){
@@ -61,6 +78,8 @@ class CCSPage extends Component{
             {details : "TIMEOUT",display : "Timeout Occured",found : false,warning : "red"},	
             {details : "TIMEOUT FOR CONNECT",display : "Timeout To Reconnect",found : false,warning : "red"},	
             {details : "Waiting for EVSE to be ready!",display : "Waiting for EVSE to be ready!",found : false,warning : "false"},
+            {details : "wrong protocol for pev",display : "Wrong protocol is detected on PEV side",found : false,warning : "red"},	
+            {details : "wrong protocol for evse",display : "Wrong protocol is detected on EVSE side",found : false,warning : "red"},	
         ]
         
         
@@ -82,7 +101,14 @@ class CCSPage extends Component{
                     role : this.state.role  ,
                     percentage : this.state.percentage,
                     started : true,
-                    continuousTest : this.state.continuousTest
+                    continuousTest : this.state.continuousTest,
+                    pevProtocol : this.state.pevProtocol,
+                    pevDeviceState : this.state.pevDeviceState,
+                    pevHpgState : this.state.pevHpgState,
+                    evseProtocol : this.state.evseProtocol,
+                    evseDeviceState : this.state.evseDeviceState,
+                    evseHpgState : this.state.evseHpgState,
+                    timeoutFound : this.state.timeoutFound
                 })
             }
             else{
@@ -95,13 +121,21 @@ class CCSPage extends Component{
                     role : this.state.role  ,
                     percentage : this.state.percentage,
                     started : true,
-                    continuousTest : this.state.continuousTest
+                    continuousTest : this.state.continuousTest,
+                    pevProtocol : this.state.pevProtocol,
+                    pevDeviceState : this.state.pevDeviceState,
+                    pevHpgState : this.state.pevHpgState,
+                    evseProtocol : this.state.evseProtocol,
+                    evseDeviceState : this.state.evseDeviceState,
+                    evseHpgState : this.state.evseHpgState,
+                    timeoutFound : this.state.timeoutFound
                 })
                 clearInterval( this.timeoutStartInterval );
             }
         }, 1000);
     }
 
+    
 
     setTimedoutStopCommand(timerValue){
         var timeoutStopCounter = timerValue
@@ -117,7 +151,14 @@ class CCSPage extends Component{
                     role : this.state.role  ,
                     percentage : this.state.percentage,
                     started : true,
-                    continuousTest : this.state.continuousTest
+                    continuousTest : this.state.continuousTest,
+                    pevProtocol : this.state.pevProtocol,
+                    pevDeviceState : this.state.pevDeviceState,
+                    pevHpgState : this.state.pevHpgState,
+                    evseProtocol : this.state.evseProtocol,
+                    evseDeviceState : this.state.evseDeviceState,
+                    evseHpgState : this.state.evseHpgState,
+                    timeoutFound : this.state.timeoutFound
                 })
             }
             else{
@@ -125,15 +166,7 @@ class CCSPage extends Component{
                 this.pevSendStopCommand();
                 this.pevStrings[11].found = false
                 //this.setTimedoutStartCommand(25);
-                this.pevStrings[13].found = true
-                this.setState({  
-                    printOutCom : this.printOutCom,
-                    toggleToRefresh : !this.state.toggleToRefresh,
-                    role : this.state.role  ,
-                    percentage : this.state.percentage,
-                    started : this.state.started,
-                    continuousTest : this.state.continuousTest
-                })
+                
                 clearInterval( this.timeoutStopInterval );
             }
         }, 1000);
@@ -144,68 +177,163 @@ class CCSPage extends Component{
         this.OpenReadComPort();
     }
 
-    ProcessSplittedCommand(sCommand){
-        console.log("ProcessSplittedCommand " ,sCommand)
-        let nowFound = false;
+    ExtractDeviceStatus_HpgState(text){
+        let ds = text.substring(text.indexOf("Device State :")+15)
+        ds = ds.substring(0,ds.indexOf(" "))
+        ds = parseInt(ds, 10);
 
+        let hpg = text.substring(text.indexOf("hpg_state:")+10)
+        let hpgState = parseInt(hpg, 10);
+
+        return {deviceState : ds, hpgState : hpgState}
+    }
+
+    ProcessSplittedCommand(sCommand){
+        
+        let nowFound = false;
         if(sCommand.length > 5){
-            if(sCommand.includes("PEER") && sCommand.includes("LOG - SLAC - CM_SET_KEY.CNF set."))
+            
+            if(sCommand.includes("PEER"))
             {
-                if(this.state.continuousTest === true)
+                if(sCommand.includes("Protocol") && sCommand.includes("hpg_state")){
+                    let foundProtocol =""
+                    if(!sCommand.includes("PLC")){
+                        this.pevStrings[15].found = true
+                    }else{
+                        foundProtocol = "PLC"
+                        this.pevStrings[15].found = false
+                    }
+
+                    let retObj = this.ExtractDeviceStatus_HpgState(sCommand)
+                    if (isNaN(retObj.deviceState))
+                    {
+                        retObj.deviceState = this.state.evseDeviceState
+                    }
+
+                    if (isNaN(retObj.hpgState))
+                    {
+                        retObj.hpgState = this.state.evseHpgState
+                    }
+
+                    this.setState({  
+                        printOutCom : this.printOutCom,
+                        toggleToRefresh : !this.state.toggleToRefresh,
+                        role : this.state.role  ,
+                        percentage : this.state.percentage,
+                        started : this.state.started,
+                        continuousTest : this.state.continuousTest,
+                        pevProtocol : this.state.pevProtocol,
+                        pevDeviceState : this.state.pevDeviceState,
+                        pevHpgState : this.state.pevHpgState,
+                        evseProtocol : foundProtocol,
+                        evseDeviceState : retObj.deviceState,
+                        evseHpgState : retObj.hpgState,
+                        timeoutFound : this.state.timeoutFound
+                    })
+                }
+                if(sCommand.includes("LOG - SLAC - CM_SET_KEY.CNF set.") )
                 {
-                    this.setTimedoutStartCommand(25)
+                    
                     this.pevStrings[13].found = false
                     nowFound = true
+                    if(this.state.continuousTest === true){
+                        this.setTimedoutStartCommand(25)
+                    }
                 }
             }else{
-                    
-                    for(let i=0;i<this.pevStrings.length;i++){
-                        if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
-                            this.pevStrings[i].found = true
-                            nowFound = true
-                            //console.log("ProcessSplittedCommand sCommand i=", i)
-                            if(i === 8)//Link Measurement
-                            {
-                                let measurementValue = sCommand.split(':')
-                                if(measurementValue.length>1){
-                                    this.pevStrings[8].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
-                                    this.linkMeasurements.push(measurementValue[1].trim())
-                                }
+                if(sCommand.includes("Protocol") && sCommand.includes("hpg_state")){
+                    let foundProtocol =""
+                    if(!sCommand.includes("PLC")){
+                        this.pevStrings[14].found = true
+                    }else{
+                        foundProtocol = "PLC"
+                        this.pevStrings[14].found = false
+                    }
+
+                    let retObj = this.ExtractDeviceStatus_HpgState(sCommand)
+                    if (isNaN(retObj.deviceState))
+                    {
+                        retObj.deviceState = this.state.pevDeviceState
+                    }
+
+                    if (isNaN(retObj.hpgState))
+                    {
+                        retObj.hpgState = this.state.pevHpgState
+                    }
+
+                    this.setState({  
+                        printOutCom : this.printOutCom,
+                        toggleToRefresh : !this.state.toggleToRefresh,
+                        role : this.state.role  ,
+                        percentage : this.state.percentage,
+                        started : this.state.started,
+                        continuousTest : this.state.continuousTest,
+                        pevProtocol : foundProtocol,
+                        pevDeviceState : retObj.deviceState,
+                        pevHpgState : retObj.hpgState,
+                        evseProtocol : this.state.evseProtocol,
+                        evseDeviceState : this.state.evseDeviceState,
+                        evseHpgState : this.state.evseHpgState,
+                        timeoutFound : this.state.timeoutFound
+                    })
+                }    
+                else{
+                    console.log("ProcessSplittedCommand " ,sCommand)
+                }
+                for(let i=0;i<this.pevStrings.length;i++){
+                    if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
+                        this.pevStrings[i].found = true
+                        nowFound = true
+                        //console.log("ProcessSplittedCommand sCommand i=", i)
+                        if(i === 8)//Link Measurement
+                        {
+                            let measurementValue = sCommand.split(':')
+                            if(measurementValue.length>1){
+                                this.pevStrings[8].display = "Link Measurement: "+Number(measurementValue[1].trim())+"ms."
+                                this.linkMeasurements.push(measurementValue[1].trim())
                             }
-                            else if(i === 10 && this.state.continuousTest === true)// IPv6 Message is received
-                            {
-                                //setTimeout(()=>{this.pevSendStopCommand()},15000);
-                                this.setTimedoutStopCommand(10);
-                            }else if(i === 11)// TIMEOUT
-                            {
-                                console.warn("ProcessSplittedCommand  | this.linkMeasurements.push(Timeout) ")
-                                this.linkMeasurements.push("Timeout")
-                                if(this.state.continuousTest === true)
-                                {
-                                    this.setTimedoutStopCommand(20);
-                                }
-                            }
-                            break;
                         }
-                    }
+                        else if(i === 10 && this.state.continuousTest === true)// IPv6 Message is received
+                        {
+                            //setTimeout(()=>{this.pevSendStopCommand()},15000);
+                            this.setTimedoutStopCommand(10);
+                        }else if(i === 11)// TIMEOUT
+                        {
 
-                    if(nowFound === true){
-                        console.warn("OKKKKKKKK")
-                        let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-3)) * 100)
-                        if(percCalc >= 90)
-                            percCalc = 100;
+                            console.warn("ProcessSplittedCommand  | this.linkMeasurements.push(Timeout) ")
+                            this.linkMeasurements.push("Timeout")
+                            if(this.state.continuousTest === true)
+                            {
+                                this.setTimedoutStopCommand(20);
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                if(nowFound === true){
+                    let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-5)) * 100)
+                    if(percCalc >= 90)
+                        percCalc = 100;
                         
-                        percCalc = Math.round(percCalc)
-
-                        this.setState({  
-                            printOutCom : this.printOutCom,
-                            toggleToRefresh : !this.state.toggleToRefresh,
-                            role : this.role  ,
-                            percentage : percCalc,
-                            started : true,
-                            continuousTest : this.state.continuousTest
-                        })
-                    }
+                    percCalc = Math.round(percCalc)
+                    console.warn("percCalc : ",percCalc)    
+                    this.setState({  
+                        printOutCom : this.printOutCom,
+                        toggleToRefresh : !this.state.toggleToRefresh,
+                        role : this.role  ,
+                        percentage : percCalc,
+                        started : true,
+                        continuousTest : this.state.continuousTest,
+                        pevProtocol : this.state.pevProtocol,
+                        pevDeviceState : this.state.pevDeviceState,
+                        pevHpgState : this.state.pevHpgState,
+                        evseProtocol : this.state.evseProtocol,
+                        evseDeviceState : this.state.evseDeviceState,
+                        evseHpgState : this.state.evseHpgState,
+                        timeoutFound : this.state.timeoutFound
+                    })
+                }
             }
         }
         
@@ -260,7 +388,12 @@ class CCSPage extends Component{
             this.ReadValues()
         },0)
 
-        
+        this.gatheringInformationInterval = setInterval(() => { 
+            const data = new Uint8Array([114]); // r
+            this.portWriter.write(data).then(res=>{
+                //console.log("Send Information Command ",res)
+            });
+         },2000);
         
        
         console.log("OpenReadComPort | end")
@@ -292,7 +425,14 @@ class CCSPage extends Component{
             checked : false,  
             percentage : 0,
             started : false,
-            continuousTest : false
+            continuousTest : false,
+            pevProtocol : "",
+            pevDeviceState : -1,
+            pevHpgState : -1,
+            evseProtocol : "",
+            evseDeviceState : -1,
+            evseHpgState : -1,
+            timeoutFound : false
           };
 
         this.queryInterval = {}
@@ -308,7 +448,7 @@ class CCSPage extends Component{
         
         this.timeoutStartInterval = {}
         this.timeoutStopInterval = {}
-        
+        this.gatheringInformationInterval = {}
 
     }
 
@@ -320,7 +460,14 @@ class CCSPage extends Component{
             role : this.state.role  ,
             percentage : this.state.percentage,
             started : this.state.started,
-            continuousTest : this.state.continuousTest
+            continuousTest : this.state.continuousTest,
+            pevProtocol : this.state.pevProtocol,
+            pevDeviceState : this.state.pevDeviceState,
+            pevHpgState : this.state.pevHpgState,
+            evseProtocol : this.state.evseProtocol,
+            evseDeviceState : this.state.evseDeviceState,
+            evseHpgState : this.state.evseHpgState,
+            timeoutFound : this.state.timeoutFound
         })
     }
   
@@ -376,7 +523,6 @@ class CCSPage extends Component{
         }
     }
     showLinkPanel(){
-        console.log("Show Link Panel",this.linkMeasurements.length)
         if(this.linkMeasurements != null && this.linkMeasurements.length > 0)
         { 
             return(
@@ -422,74 +568,114 @@ class CCSPage extends Component{
             role : this.state.role  ,
             percentage : this.state.percentage,
             started : this.state.started,
-            continuousTest : !this.state.continuousTest
+            continuousTest : !this.state.continuousTest,
+            pevProtocol : this.state.pevProtocol,
+            pevDeviceState : this.state.pevDeviceState,
+            pevHpgState : this.state.pevHpgState,
+            evseProtocol : this.state.evseProtocol,
+            evseDeviceState : this.state.evseDeviceState,
+            evseHpgState : this.state.evseHpgState,
+            timeoutFound : this.state.timeoutFound
         })
     }
-
+    
     render(){
-        return (
-            <div>
-                <h1 className="cs">FoE-Charger</h1>
-                    <div className="circle cir"><p className="c">F</p>
-                    <div className="circle one"></div>
-                    <div className="circle two">
-                        <div className="circle three">
-                    </div>
-                    </div>
-                    </div>
-
-                    <div className="wrapper">
-                    <div className="bar left"></div>
-                    <div className="bar top"></div>
-                    <div className="bar right"></div>
-                    <div className="bar bottom"></div>
-                    <br/>
-                    <Grid container>
-                    <Grid item xs={2}>
-                    </Grid>
-                    <Grid item xs={2}>
-                    <div className='Action_button_1' onClick={this.pevSendStartCommand}/>
-                    </Grid>
-                    <Grid item xs={2}>
-                    <div className='Action_button_2' onClick={this.pevSendStopCommand}/>
-                    </Grid>
-                    <Grid item xs={2} >
-                        <div style={{marginTop: '20px'}}>
-                            <span className='continuousText'>Continuous Test</span>
-                            {
-                                this.state.continuousTest ? 
-                                    <div style={{marginLeft: '30px'}} className='continuousSelectionSelected' onClick={this.setContinuosState} />: 
-                                    <div style={{marginLeft: '30px'}} className='continuousSelectionUnselected' onClick={this.setContinuosState} /> 
-                            }
-                            
+        if(this.state.pevProtocol === "PLC" && this.state.evseProtocol === "PLC"){
+            console.log("PEV ",this.state.pevDeviceState,this.state.pevHpgState," EVSE ",this.state.evseDeviceState,this.state.evseHpgState)
+            return (
+                <div>
+                    <h1 className="cs">FoE-Charger</h1>
+                        <div className="circle cir"><p className="c">F</p>
+                        <div className="circle one"></div>
+                        <div className="circle two">
+                            <div className="circle three">
                         </div>
-                    </Grid>
-                    <Grid item xs={2}>
-                    </Grid>
-                    <Grid item xs={2} >
-                        <div className='parentWheel'>
-                            <div className='Outer_wheel'/>
-                            <div className='Wheel_Base'/>
-                            {this.state.started ? <div className='Ineer_wheel Ineer_wheel_Animation'/> : <div className='Ineer_wheel'/>}
-                            <div className='Percentage_wheel'><span id='percentage'>{this.state.percentage}</span>%</div>
                         </div>
-                    
-                    </Grid>
-                    </Grid>
-                    
-                    
-                    <Grid container>
-                    <Grid item xs={6}>
-                        {this.showDetailedProgress()}
-                    </Grid>
-                    <Grid item xs={6}>
-                    {this.showLinkPanel()}
-                    </Grid>
-                    </Grid>                
-                    
-                    </div>
-            </div>
-            );
+                        </div>
+    
+                        <div className="wrapper">
+                        <div className="bar left"></div>
+                        <div className="bar top"></div>
+                        <div className="bar right"></div>
+                        <div className="bar bottom"></div>
+                        <br/>
+                        <Grid container>
+                        <Grid item xs={2}>
+                        </Grid>
+                        <Grid item xs={2}>
+                        {(this.state.pevDeviceState === 0 &&  this.state.evseDeviceState === 0 && this.state.pevHpgState === 8 &&  this.state.evseHpgState === 8)? <div className='Action_button_1' onClick={this.pevSendStartCommand}/> : null}
+                        </Grid>
+                        <Grid item xs={2}>
+                        {((this.state.pevDeviceState === 11 &&  this.state.evseDeviceState === 10 && this.state.pevHpgState === 10 &&  this.state.evseHpgState === 10) || this.state.timeoutFound ) ? <div className='Action_button_2' onClick={this.pevSendStopCommand}/> : null}
+                        
+                        
+                        </Grid>
+                        <Grid item xs={2} >
+                            <div style={{marginTop: '20px'}}>
+                                <span className='continuousText'>Continuous Test</span>
+                                {
+                                    this.state.continuousTest ? 
+                                        <div style={{marginLeft: '30px'}} className='continuousSelectionSelected' onClick={this.setContinuosState} />: 
+                                        <div style={{marginLeft: '30px'}} className='continuousSelectionUnselected' onClick={this.setContinuosState} /> 
+                                }
+                                
+                            </div>
+                        </Grid>
+                        <Grid item xs={2}>
+                        </Grid>
+                        <Grid item xs={2} >
+                            <div className='parentWheel'>
+                                <div className='Outer_wheel'/>
+                                <div className='Wheel_Base'/>
+                                {this.state.started ? <div className='Ineer_wheel Ineer_wheel_Animation'/> : <div className='Ineer_wheel'/>}
+                                <div className='Percentage_wheel'><span id='percentage'>{this.state.percentage}</span>%</div>
+                            </div>
+                        
+                        </Grid>
+                        </Grid>
+                        
+                        
+                        <Grid container>
+                        <Grid item xs={6}>
+                            {this.showDetailedProgress()}
+                        </Grid>
+                        <Grid item xs={6}>
+                        {this.showLinkPanel()}
+                        </Grid>
+                        </Grid>                
+                        
+                        </div>
+                </div>
+                );   
+        }else{
+            return (
+                <div>
+                    <h1 className="cs">FoE-Charger</h1>
+                        <div className="circle cir"><p className="c">F</p>
+                        <div className="circle one"></div>
+                        <div className="circle two">
+                            <div className="circle three">
+                        </div>
+                        </div>
+                        </div>
+    
+                        <div className="wrapper">
+                        <div className="bar left"></div>
+                        <div className="bar top"></div>
+                        <div className="bar right"></div>
+                        <div className="bar bottom"></div>
+                        <br/>
+                        <br/><br/><br/>
+                        <Grid container>
+                        <Grid item xs={6}>
+                            {this.showDetailedProgress()}
+                        </Grid>
+                        </Grid>                
+                        </div>
+                </div>
+                );
+        }
+        
     }
 
 /*
