@@ -79,7 +79,8 @@ class CCSPage extends Component{
             {details : "TIMEOUT FOR CONNECT",display : "Timeout To Reconnect",found : false,warning : "red"},	
             {details : "Waiting for EVSE to be ready!",display : "Waiting for EVSE to be ready!",found : false,warning : "false"},
             {details : "wrong protocol for pev",display : "Wrong protocol is detected on PEV side",found : false,warning : "red"},	
-            {details : "wrong protocol for evse",display : "Wrong protocol is detected on EVSE side",found : false,warning : "red"},	
+            {details : "wrong protocol for evse",display : "Wrong protocol is detected on EVSE side",found : false,warning : "red"},
+            {details : "System is not completed, Power ON Evse Simulator",display : "System is not completed, Power ON Evse Simulator",found : false,warning : "red"},		
         ]
         
         
@@ -215,6 +216,9 @@ class CCSPage extends Component{
                         retObj.hpgState = this.state.evseHpgState
                     }
 
+                    this.pevStrings[16].found = false
+                    this.peerMessageRcvTimestamp = Date.now()
+
                     this.setState({  
                         printOutCom : this.printOutCom,
                         toggleToRefresh : !this.state.toggleToRefresh,
@@ -312,7 +316,7 @@ class CCSPage extends Component{
                 }
 
                 if(nowFound === true){
-                    let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-5)) * 100)
+                    let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-6)) * 100)
                     if(percCalc >= 90)
                         percCalc = 100;
                         
@@ -383,6 +387,7 @@ class CCSPage extends Component{
 
         this.portWriter = p_Port.port.writable.getWriter();
         
+        
 
         setTimeout(()=>{
             this.ReadValues()
@@ -393,6 +398,28 @@ class CCSPage extends Component{
             this.portWriter.write(data).then(res=>{
                 //console.log("Send Information Command ",res)
             });
+
+            const millis = Date.now() - this.peerMessageRcvTimestamp
+            if(millis > 10000 || (this.state.evseDeviceState === -1 && this.state.evseHpgState === -1)){
+                this.pevStrings[16].found = true;
+
+                this.setState({  
+                    printOutCom : this.printOutCom,
+                    toggleToRefresh : !this.state.toggleToRefresh,
+                    role : this.state.role  ,
+                    percentage : this.state.percentage,
+                    started : this.state.started,
+                    continuousTest : this.state.continuousTest,
+                    pevProtocol : this.state.pevProtocol,
+                    pevDeviceState : this.state.pevDeviceState,
+                    pevHpgState : this.state.pevHpgState,
+                    evseProtocol : "",
+                    evseDeviceState : -1,
+                    evseHpgState : -1,
+                    timeoutFound : this.state.timeoutFound
+                })
+
+            }
          },2000);
         
        
@@ -580,8 +607,8 @@ class CCSPage extends Component{
     }
     
     render(){
+        console.log("PEV ",this.state.pevDeviceState,this.state.pevHpgState," EVSE ",this.state.evseDeviceState,this.state.evseHpgState,"timeoutFound ",this.state.timeoutFound)
         if(this.state.pevProtocol === "PLC" && this.state.evseProtocol === "PLC"){
-            console.log("PEV ",this.state.pevDeviceState,this.state.pevHpgState," EVSE ",this.state.evseDeviceState,this.state.evseHpgState)
             return (
                 <div>
                     <h1 className="cs">FoE-Charger</h1>
