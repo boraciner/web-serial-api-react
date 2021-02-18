@@ -50,7 +50,8 @@ class ChademoPage extends Component{
             {details : "Event | Set | t7",display : "EVSE | Set | t7",found : false,warning : "false"},
             {details : "Event | Set | t7",display : "EVSE | Set | t7",found : false,warning : "false"},
             {details : "wrong protocol for pev",display : "Wrong protocol is detected on PEV side",found : false,warning : "red"},	
-            {details : "wrong protocol for evse",display : "Wrong protocol is detected on EVSE side",found : false,warning : "red"},	
+            {details : "wrong protocol for evse",display : "Wrong protocol is detected on EVSE side",found : false,warning : "red"},
+            {details : "Timeout",display : "Timeout",found : false,warning : "red"},
         ]
         
         
@@ -186,6 +187,10 @@ class ChademoPage extends Component{
                             {
                                 this.setTimedoutStartCommand(5)
                             }
+                        }
+                        if(i === 17)
+                        {
+                            this.pevStrings[i].display = sCommand.substring(sCommand.indexOf("Timeout"))      
                         }
                         break;
                     }
@@ -466,7 +471,7 @@ class ChademoPage extends Component{
                         <Grid item xs={2}>
                         </Grid>
                         <Grid item xs={4}>
-                        {(this.state.pevDeviceState === 0 && this.state.evseDeviceState === 0) ?<div className='Action_button_1' onClick={this.pevSendStartCommand}/> : null }
+                        {((this.state.pevDeviceState === 0 || this.state.pevDeviceState === 4) && this.state.evseDeviceState === 0) ?<div className='Action_button_1' onClick={this.pevSendStartCommand}/> : null }
                         </Grid>
                         
                         <Grid item xs={2} >
