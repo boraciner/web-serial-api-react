@@ -52,6 +52,8 @@ class ChademoPage extends Component{
             {details : "wrong protocol for pev",display : "Wrong protocol is detected on PEV side",found : false,warning : "red"},	
             {details : "wrong protocol for evse",display : "Wrong protocol is detected on EVSE side",found : false,warning : "red"},
             {details : "Timeout",display : "Timeout",found : false,warning : "red"},
+            {details : "System is not completed, Power ON Evse Simulator",display : "System is not completed, Power ON Evse Simulator",found : false,warning : "red",blink : true},	
+            {details : "Power On PEV and Restart the Page",display : "Power On PEV and Restart the Page",found : false,warning : "red",blink : false},		
         ]
         
         
@@ -125,6 +127,9 @@ class ChademoPage extends Component{
             if(sCommand.includes("PEER") && sCommand.includes("}"))
             {
                 let evseStr = sCommand.substring(sCommand.indexOf("PEER-")+5)
+                this.peerMessageRcvTimestamp = Date.now()
+                this.pevStrings[18].found = false
+
                 try {
                     let evseDevice = JSON.parse(evseStr);
                    
@@ -234,7 +239,7 @@ class ChademoPage extends Component{
         }
         
     }
-
+/*
     ReadValues(){
         this.portReader.read().then(res=>{
             this.rawData += new TextDecoder("utf-8").decode(res.value);
@@ -246,7 +251,40 @@ class ChademoPage extends Component{
             this.ReadValues()
         });
     }
+*/
+async ReadValues(){
 
+    for(;;){
+        try{
+            let ret = await this.portReader.read();
+            this.connectionLost = false
+            this.rawData += new TextDecoder("utf-8").decode(ret.value);
+            this.ProcessRawData()
+            this.pevStrings[19].found = false;
+        }
+        catch(err){
+            console.error("READ VALUES ERROR " ,err)
+            this.connectionLost = true
+            this.pevStrings[19].found = true;
+
+            this.setState({  
+                printOutCom : this.printOutCom,
+                toggleToRefresh : !this.state.toggleToRefresh,
+                role : this.state.role  ,
+                percentage : this.state.percentage,
+                started : this.state.started,
+                continuousTest : this.state.continuousTest,
+                pevProtocol : this.state.pevProtocol,
+                pevDeviceState : -1,
+                evseProtocol : this.state.evseProtocol,
+                evseDeviceState : -1,
+                timeoutFound : this.state.timeoutFound
+            })
+
+            break
+        }
+    }
+}
     
     async OpenReadComPort(){
         console.log("OpenReadComPort | begin")
@@ -268,11 +306,38 @@ class ChademoPage extends Component{
         setTimeout(()=>{
             this.ReadValues()
         },0)
+
         this.gatheringInformationInterval = setInterval(() => { 
+            if(this.connectionLost)
+                return
+
             const data = new Uint8Array([114]); // r
             this.portWriter.write(data).then(res=>{
                 //console.log("Send Information Command ",res)
             });
+            const millis = Date.now() - this.peerMessageRcvTimestamp
+            console.log("peerMessageRcvTimestamp >>> millis ",millis)
+            if(this.peerMessageRcvTimestamp === undefined || millis > 6000 || (this.state.evseDeviceState === -1 && this.state.evseHpgState === -1)){
+                console.log("peerMessageRcvTimestamp >>> 1")
+                console.error("Connection lost to EVSE")
+                this.initializePEVStrings()
+                this.pevStrings[18].found = true;
+
+                this.setState({  
+                    printOutCom : this.printOutCom,
+                    toggleToRefresh : !this.state.toggleToRefresh,
+                    role : this.state.role  ,
+                    percentage : this.state.percentage,
+                    started : this.state.started,
+                    continuousTest : this.state.continuousTest,
+                    pevProtocol : this.state.pevProtocol,
+                    pevDeviceState : this.state.pevDeviceState,
+                    evseProtocol :-1,
+                    evseDeviceState : -1,
+                    timeoutFound : this.state.timeoutFound
+                })
+
+            }
          },2000);
         
         
