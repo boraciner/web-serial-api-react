@@ -702,10 +702,10 @@ class CCSPage extends Component{
                         <Grid item xs={2}>
                         </Grid>
                         <Grid item xs={2}>
-                        {(this.state.pevDeviceState === 0 &&  this.state.evseDeviceState === 0 && this.state.pevHpgState === 8 &&  this.state.evseHpgState === 8)? <div className='Action_button_1' onClick={this.pevSendStartCommand}/> : null}
+                        {(this.state.pevDeviceState === 0 &&  this.state.evseDeviceState === 0 && this.state.pevHpgState === 8 &&  this.state.evseHpgState === 9)? <div className='Action_button_1' onClick={this.pevSendStartCommand}/> : null}
                         </Grid>
                         <Grid item xs={2}>
-                        {((this.state.pevDeviceState === 11 &&  this.state.evseDeviceState === 10 && this.state.pevHpgState === 10 &&  this.state.evseHpgState === 10) || this.state.timeoutFound ) ? <div className='Action_button_2' onClick={this.pevSendStopCommand}/> : null}
+                        {((this.state.pevDeviceState === 11 &&  this.state.evseDeviceState === 10 && this.state.pevHpgState === 10 &&  this.state.evseHpgState === 11) || this.state.timeoutFound ) ? <div className='Action_button_2' onClick={this.pevSendStopCommand}/> : null}
                         
                         
                         </Grid>
