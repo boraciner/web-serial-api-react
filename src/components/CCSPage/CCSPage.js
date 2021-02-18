@@ -333,20 +333,36 @@ class CCSPage extends Component{
                             this.setTimedoutStopCommand(10);
                         }else if(i === 11)// TIMEOUT
                         {
-
                             console.warn("ProcessSplittedCommand  | this.linkMeasurements.push(Timeout) ")
+                            this.pevStrings[i].display = sCommand
+                            
                             this.linkMeasurements.push("Timeout")
                             if(this.state.continuousTest === true)
                             {
                                 this.setTimedoutStopCommand(20);
                             }
+                            this.setState({  
+                                printOutCom : this.state.printOutCom,
+                                toggleToRefresh : !this.state.toggleToRefresh,
+                                role : this.state.role  ,
+                                percentage : this.state.percentage,
+                                started : this.state.started,
+                                continuousTest : this.state.continuousTest,
+                                pevProtocol : this.state.pevProtocol,
+                                pevDeviceState : this.state.pevDeviceState,
+                                pevHpgState : this.state.pevHpgState,
+                                evseProtocol : this.state.evseProtocol,
+                                evseDeviceState : this.state.evseDeviceState,
+                                evseHpgState : this.state.evseHpgState,
+                                timeoutFound : true
+                            })
                         }
                         break;
                     }
                 }
 
                 if(nowFound === true){
-                    let percCalc = this.state.percentage + ((1 / (this.pevStrings.length-6)) * 100)
+                    let percCalc = this.state.percentage + ((1 / 11) * 100)
                     if(percCalc >= 90)
                         percCalc = 100;
                         
