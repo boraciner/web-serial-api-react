@@ -23,6 +23,7 @@ class CCSPage extends Component{
             pevDeviceState : this.state.pevDeviceState,
             pevHpgState : this.state.pevHpgState,
             evseProtocol : this.state.evseProtocol,
+            evseAmplitude : this.state.evseAmplitude,
             evseDeviceState : this.state.evseDeviceState,
             evseHpgState : this.state.evseHpgState,
             timeoutFound : this.state.timeoutFound
@@ -57,6 +58,7 @@ class CCSPage extends Component{
             pevDeviceState : this.state.pevDeviceState,
             pevHpgState : this.state.pevHpgState,
             evseProtocol : this.state.evseProtocol,
+            evseAmplitude : this.state.evseAmplitude,
             evseDeviceState : this.state.evseDeviceState,
             evseHpgState : this.state.evseHpgState,
             timeoutFound : false
@@ -108,6 +110,7 @@ class CCSPage extends Component{
                     pevDeviceState : this.state.pevDeviceState,
                     pevHpgState : this.state.pevHpgState,
                     evseProtocol : this.state.evseProtocol,
+                    evseAmplitude : this.state.evseAmplitude,
                     evseDeviceState : this.state.evseDeviceState,
                     evseHpgState : this.state.evseHpgState,
                     timeoutFound : this.state.timeoutFound
@@ -128,6 +131,7 @@ class CCSPage extends Component{
                     pevDeviceState : this.state.pevDeviceState,
                     pevHpgState : this.state.pevHpgState,
                     evseProtocol : this.state.evseProtocol,
+                    evseAmplitude : this.state.evseAmplitude,
                     evseDeviceState : this.state.evseDeviceState,
                     evseHpgState : this.state.evseHpgState,
                     timeoutFound : this.state.timeoutFound
@@ -158,6 +162,7 @@ class CCSPage extends Component{
                     pevDeviceState : this.state.pevDeviceState,
                     pevHpgState : this.state.pevHpgState,
                     evseProtocol : this.state.evseProtocol,
+                    evseAmplitude : this.state.evseAmplitude,
                     evseDeviceState : this.state.evseDeviceState,
                     evseHpgState : this.state.evseHpgState,
                     timeoutFound : this.state.timeoutFound
@@ -185,10 +190,18 @@ class CCSPage extends Component{
         ds = parseInt(ds, 10);
 
         let hpg = text.substring(text.indexOf("hpg_state:")+10)
+        hpg = hpg.substring(0,hpg.indexOf(" "))
         let hpgState = parseInt(hpg, 10);
 
         return {deviceState : ds, hpgState : hpgState}
     }
+
+    ExtractDeviceStatus_Amplitude(text){
+        let amp = text.substring(text.indexOf("Amplitude:")+10)
+        amp = parseInt(amp, 10);
+        return amp
+    }
+
 
     ProcessSplittedCommand(sCommand){
         
@@ -197,123 +210,90 @@ class CCSPage extends Component{
             console.log("sCommand ",sCommand)
             if(sCommand.includes("PEER"))
             {
-                this.pevStrings[16].found = false
-                this.peerMessageRcvTimestamp = Date.now()
-                if(sCommand.includes("Protocol")){
-                    let foundProtocol ="Chademo"
-                    if(!sCommand.includes("PLC")){
-                        this.pevStrings[15].found = true
-                    }else{
-                        foundProtocol = "PLC"
-                        this.pevStrings[15].found = false
-                    }
+                if(sCommand.includes("}") )
+                {
+                    this.pevStrings[16].found = false
+                    this.peerMessageRcvTimestamp = Date.now()
 
-                    this.setState({  
-                        printOutCom : this.printOutCom,
-                        toggleToRefresh : !this.state.toggleToRefresh,
-                        role : this.state.role  ,
-                        percentage : this.state.percentage,
-                        started : this.state.started,
-                        continuousTest : this.state.continuousTest,
-                        pevProtocol : this.state.pevProtocol,
-                        pevDeviceState : this.state.pevDeviceState,
-                        pevHpgState : this.state.pevHpgState,
-                        evseProtocol : foundProtocol,
-                        evseDeviceState : this.state.evseDeviceState,
-                        evseHpgState : this.state.evseHpgState,
-                        timeoutFound : this.state.timeoutFound
-                    })
-                }    
-                if(sCommand.includes("hpg_state")){
-                    let retObj = this.ExtractDeviceStatus_HpgState(sCommand)
-                    if (isNaN(retObj.deviceState))
-                    {
-                        retObj.deviceState = this.state.pevDeviceState
-                    }
-                    if (isNaN(retObj.hpgState))
-                    {
-                        retObj.hpgState = this.state.pevHpgState
-                    }
+                    let evseStr = sCommand.substring(sCommand.indexOf("PEER-")+5)
+                    try {
+                        let evseDevice = JSON.parse(evseStr);
+                        if(evseDevice.protocol === "PLC"){
+                            this.pevStrings[15].found = false
+                        }else{
+                            this.pevStrings[15].found = true
+                        }
 
-                    this.setState({  
-                        printOutCom : this.printOutCom,
-                        toggleToRefresh : !this.state.toggleToRefresh,
-                        role : this.state.role  ,
-                        percentage : this.state.percentage,
-                        started : this.state.started,
-                        continuousTest : this.state.continuousTest,
-                        pevProtocol : this.state.pevProtocol,
-                        pevDeviceState : this.state.pevDeviceState,
-                        pevHpgState : this.state.pevHpgState,
-                        evseProtocol : this.state.evseProtocol,
-                        evseDeviceState : retObj.deviceState,
-                        evseHpgState : retObj.hpgState,
-                        timeoutFound : this.state.timeoutFound
-                    })
+                        if(evseDevice.deviceState === 0 && evseDevice.hpgState ===9 ){
+                            this.pevStrings[13].found = false
+                        }
+
+
+                        this.setState({  
+                            printOutCom : this.printOutCom,
+                            toggleToRefresh : !this.state.toggleToRefresh,
+                            role : this.state.role  ,
+                            percentage : this.state.percentage,
+                            started : this.state.started,
+                            continuousTest : this.state.continuousTest,
+                            pevProtocol : this.state.pevProtocol,
+                            pevDeviceState : this.state.pevDeviceState,
+                            pevHpgState : this.state.pevHpgState,
+                            evseProtocol : evseDevice.protocol,
+                            evseAmplitude : evseDevice.amplitude,
+                            evseDeviceState : evseDevice.deviceState,
+                            evseHpgState : evseDevice.hpgState,
+                            timeoutFound : this.state.timeoutFound
+                        })
+
+                    } catch (e) {
+                        return false;
+                    }
                 }
+
                 if(sCommand.includes("LOG - SLAC - CM_SET_KEY.CNF set.") )
                 {
-                    
-                    this.pevStrings[13].found = false
+                    console.log(">>>>>>>>>TRY CONTINUOS MODE")
                     nowFound = true
                     if(this.state.continuousTest === true){
-                        this.setTimedoutStartCommand(25)
+                        console.log(">>>>>>>>>TRY CONTINUOS MODE okkkkkkkkkkkkk")
+                        this.setTimedoutStartCommand(35)
                     }
                 }
             }else{
-                if(sCommand.includes("Protocol")){
-                    let foundProtocol ="Chademo"
-                    if(!sCommand.includes("PLC")){
-                        this.pevStrings[14].found = true
-                    }else{
-                        foundProtocol = "PLC"
-                        this.pevStrings[14].found = false
+                if(sCommand.includes("protocol")){
+
+                    let pevStr = sCommand.substring(sCommand.indexOf("PEV-")+4)
+                    try {
+                        let pevDevice = JSON.parse(pevStr);
+                        if(pevDevice.protocol === "PLC"){
+                            this.pevStrings[14].found = false
+                        }else{
+                            this.pevStrings[14].found = true
+                        }
+
+                        this.setState({  
+                            printOutCom : this.printOutCom,
+                            toggleToRefresh : !this.state.toggleToRefresh,
+                            role : this.state.role  ,
+                            percentage : this.state.percentage,
+                            started : this.state.started,
+                            continuousTest : this.state.continuousTest,
+                            pevProtocol : pevDevice.protocol,
+                            pevDeviceState : pevDevice.deviceState,
+                            pevHpgState : pevDevice.hpgState,
+                            evseProtocol : this.state.evseProtocol,
+                            evseAmplitude : this.state.evseAmplitude,
+                            evseDeviceState : this.state.evseDeviceState,
+                            evseHpgState : this.state.evseHpgState,
+                            timeoutFound : this.state.timeoutFound
+                        })
+
+                    } catch (e) {
                     }
 
-                    this.setState({  
-                        printOutCom : this.printOutCom,
-                        toggleToRefresh : !this.state.toggleToRefresh,
-                        role : this.state.role  ,
-                        percentage : this.state.percentage,
-                        started : this.state.started,
-                        continuousTest : this.state.continuousTest,
-                        pevProtocol : foundProtocol,
-                        pevDeviceState : this.state.pevDeviceState,
-                        pevHpgState : this.state.pevHpgState,
-                        evseProtocol : this.state.evseProtocol,
-                        evseDeviceState : this.state.evseDeviceState,
-                        evseHpgState : this.state.evseHpgState,
-                        timeoutFound : this.state.timeoutFound
-                    })
-                }    
-                if(sCommand.includes("hpg_state")){
-                    let retObj = this.ExtractDeviceStatus_HpgState(sCommand)
-                    if (isNaN(retObj.deviceState))
-                    {
-                        retObj.deviceState = this.state.pevDeviceState
-                    }
-                    if (isNaN(retObj.hpgState))
-                    {
-                        retObj.hpgState = this.state.pevHpgState
-                    }
-
-                    this.setState({  
-                        printOutCom : this.printOutCom,
-                        toggleToRefresh : !this.state.toggleToRefresh,
-                        role : this.state.role  ,
-                        percentage : this.state.percentage,
-                        started : this.state.started,
-                        continuousTest : this.state.continuousTest,
-                        pevProtocol : this.state.pevProtocol,
-                        pevDeviceState : retObj.deviceState,
-                        pevHpgState : retObj.hpgState,
-                        evseProtocol : this.state.evseProtocol,
-                        evseDeviceState : this.state.evseDeviceState,
-                        evseHpgState : this.state.evseHpgState,
-                        timeoutFound : this.state.timeoutFound
-                    })
                 }
-                
+                   
                 for(let i=0;i<this.pevStrings.length;i++){
                     if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
                         this.pevStrings[i].found = true
@@ -352,6 +332,7 @@ class CCSPage extends Component{
                                 pevDeviceState : this.state.pevDeviceState,
                                 pevHpgState : this.state.pevHpgState,
                                 evseProtocol : this.state.evseProtocol,
+                                evseAmplitude : this.state.evseAmplitude,
                                 evseDeviceState : this.state.evseDeviceState,
                                 evseHpgState : this.state.evseHpgState,
                                 timeoutFound : true
@@ -379,6 +360,7 @@ class CCSPage extends Component{
                         pevDeviceState : this.state.pevDeviceState,
                         pevHpgState : this.state.pevHpgState,
                         evseProtocol : this.state.evseProtocol,
+                        evseAmplitude : this.state.evseAmplitude,
                         evseDeviceState : this.state.evseDeviceState,
                         evseHpgState : this.state.evseHpgState,
                         timeoutFound : this.state.timeoutFound
@@ -430,6 +412,7 @@ class CCSPage extends Component{
                     pevDeviceState : -1,
                     pevHpgState : -1,
                     evseProtocol : this.state.evseProtocol,
+                    evseAmplitude : this.state.evseAmplitude,
                     evseDeviceState : -1,
                     evseHpgState : -1,
                     timeoutFound : this.state.timeoutFound
@@ -502,6 +485,7 @@ class CCSPage extends Component{
                     pevDeviceState : this.state.pevDeviceState,
                     pevHpgState : this.state.pevHpgState,
                     evseProtocol : this.state.evseProtocol,
+                    evseAmplitude : this.state.evseAmplitude,
                     evseDeviceState : -1,
                     evseHpgState : -1,
                     timeoutFound : this.state.timeoutFound
@@ -545,6 +529,7 @@ class CCSPage extends Component{
             pevDeviceState : -1,
             pevHpgState : -1,
             evseProtocol : "",
+            evseAmplitude : 0,
             evseDeviceState : -1,
             evseHpgState : -1,
             timeoutFound : false
@@ -580,6 +565,7 @@ class CCSPage extends Component{
             pevDeviceState : this.state.pevDeviceState,
             pevHpgState : this.state.pevHpgState,
             evseProtocol : this.state.evseProtocol,
+            evseAmplitude : this.state.evseAmplitude,
             evseDeviceState : this.state.evseDeviceState,
             evseHpgState : this.state.evseHpgState,
             timeoutFound : this.state.timeoutFound
@@ -700,13 +686,14 @@ class CCSPage extends Component{
             pevHpgState : this.state.pevHpgState,
             evseProtocol : this.state.evseProtocol,
             evseDeviceState : this.state.evseDeviceState,
+            evseAmplitude : this.state.evseAmplitude,
             evseHpgState : this.state.evseHpgState,
             timeoutFound : this.state.timeoutFound
         })
     }
     
     render(){
-        console.log("PEV ",this.state.pevProtocol, " --- ",this.state.pevDeviceState,this.state.pevHpgState," EVSE ",this.state.evseProtocol," --- ",this.state.evseDeviceState,this.state.evseHpgState,"timeoutFound ",this.state.timeoutFound)
+        console.log("Continuos Mode",this.state.continuousTest,"PEV ",this.state.pevProtocol, " --- ",this.state.pevDeviceState,this.state.pevHpgState," EVSE ",this.state.evseProtocol," --- ",this.state.evseDeviceState,this.state.evseHpgState,"Amp",this.state.evseAmplitude,"timeoutFound ",this.state.timeoutFound)
         if(this.state.pevProtocol === "PLC" && this.state.evseProtocol === "PLC"){
             return (
                 <div>
@@ -729,10 +716,10 @@ class CCSPage extends Component{
                         <Grid item xs={2}>
                         </Grid>
                         <Grid item xs={2}>
-                        {(this.state.pevDeviceState === 0 &&  this.state.evseDeviceState === 0 && this.state.pevHpgState === 9 &&  this.state.evseHpgState === 9)? <div className='Action_button_1' onClick={this.pevSendStartCommand}/> : null}
+                        {(this.state.pevDeviceState === 0 &&  this.state.evseDeviceState === 0 && this.state.pevHpgState === 9 &&  this.state.evseHpgState === 9 && this.state.evseAmplitude === 1)? <div className='Action_button_1' onClick={this.pevSendStartCommand}/> : null}
                         </Grid>
                         <Grid item xs={2}>
-                        {((this.state.pevDeviceState === 11 &&  this.state.evseDeviceState === 10 && this.state.pevHpgState === 10 &&  this.state.evseHpgState === 11) || this.state.timeoutFound ) ? <div className='Action_button_2' onClick={this.pevSendStopCommand}/> : null}
+                        {((this.state.pevDeviceState === 11 &&  this.state.evseDeviceState === 10 && this.state.pevHpgState === 11 &&  this.state.evseHpgState === 11) || this.state.timeoutFound ) ? <div className='Action_button_2' onClick={this.pevSendStopCommand}/> : null}
                         
                         
                         </Grid>
