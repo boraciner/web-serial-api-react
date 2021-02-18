@@ -22,10 +22,8 @@ class ChademoPage extends Component{
             continuousTest : this.state.continuousTest,
             pevProtocol : this.state.pevProtocol,
             pevDeviceState : this.state.pevDeviceState,
-            pevHpgState : this.state.pevHpgState,
             evseProtocol : this.state.evseProtocol,
             evseDeviceState : this.state.evseDeviceState,
-            evseHpgState : this.state.evseHpgState,
             timeoutFound : this.state.timeoutFound
         })
     }
@@ -77,10 +75,8 @@ class ChademoPage extends Component{
                     continuousTest : this.state.continuousTest,
                     pevProtocol : this.state.pevProtocol,
                     pevDeviceState : this.state.pevDeviceState,
-                    pevHpgState : this.state.pevHpgState,
                     evseProtocol : this.state.evseProtocol,
                     evseDeviceState : this.state.evseDeviceState,
-                    evseHpgState : this.state.evseHpgState,
                     timeoutFound : this.state.timeoutFound
                 })
             }
@@ -97,10 +93,8 @@ class ChademoPage extends Component{
                     continuousTest : this.state.continuousTest,
                     pevProtocol : this.state.pevProtocol,
                     pevDeviceState : this.state.pevDeviceState,
-                    pevHpgState : this.state.pevHpgState,
                     evseProtocol : this.state.evseProtocol,
                     evseDeviceState : this.state.evseDeviceState,
-                    evseHpgState : this.state.evseHpgState,
                     timeoutFound : this.state.timeoutFound
                 })
                 clearInterval( this.timeoutStartInterval );
@@ -127,27 +121,17 @@ class ChademoPage extends Component{
 
         if(sCommand.length > 5){
             console.log("ProcessSplittedCommand " ,sCommand)
-            if(sCommand.includes("PEER-Protocol:") && sCommand.includes("Device State"))
+            if(sCommand.includes("PEER") && sCommand.includes("}"))
             {
-                    console.log("2ProcessSplittedCommand")
-                    let foundProtocol =""
-                    if(!sCommand.includes("Chademo")){
+                let evseStr = sCommand.substring(sCommand.indexOf("PEER-")+5)
+                try {
+                    let evseDevice = JSON.parse(evseStr);
+                   
+                    if(evseDevice.protocol === "PLC"){
                         this.pevStrings[16].found = true
-                        console.log("3ProcessSplittedCommand")
                     }else{
-                        foundProtocol = "Chademo"
                         this.pevStrings[16].found = false
-                        console.log("4ProcessSplittedCommand")
                     }
-
-                    let retObj = this.ExtractDeviceStatus(sCommand)
-                    if (isNaN(retObj.deviceState))
-                    {
-                        retObj.deviceState = this.state.evseDeviceState
-                    }
-
-                  
-
                     this.setState({  
                         printOutCom : this.printOutCom,
                         toggleToRefresh : !this.state.toggleToRefresh,
@@ -157,87 +141,80 @@ class ChademoPage extends Component{
                         continuousTest : this.state.continuousTest,
                         pevProtocol : this.state.pevProtocol,
                         pevDeviceState : this.state.pevDeviceState,
-                        pevHpgState : this.state.pevHpgState,
-                        evseProtocol : foundProtocol,
-                        evseDeviceState : retObj.deviceState,
-                        evseHpgState : this.state.hpgState,
+                        evseProtocol : evseDevice.protocol,
+                        evseDeviceState : evseDevice.deviceState,
                         timeoutFound : this.state.timeoutFound
                     })
+                }catch (e) {
+                    return false;
+                }
             }else{
-                if(sCommand.includes("Protocol") && sCommand.includes("Device State")){
-                    let foundProtocol =""
-                    if(!sCommand.includes("Chademo")){
-                        this.pevStrings[15].found = true
-                    }else{
-                        foundProtocol = "Chademo"
-                        this.pevStrings[15].found = false
+                if(sCommand.includes("protocol") && sCommand.includes("}")){
+                    
+                    let pevStr = sCommand.substring(sCommand.indexOf("PEV-")+4)
+                    try {
+                        let pevDevice = JSON.parse(pevStr);
+                        if(pevDevice.protocol === "PLC"){
+                            this.pevStrings[15].found = true
+                        }else{
+                            this.pevStrings[15].found = false
+                        }
+                        this.setState({  
+                            printOutCom : this.printOutCom,
+                            toggleToRefresh : !this.state.toggleToRefresh,
+                            role : this.state.role  ,
+                            percentage : this.state.percentage,
+                            started : this.state.started,
+                            continuousTest : this.state.continuousTest,
+                            pevProtocol : pevDevice.protocol,
+                            pevDeviceState : pevDevice.deviceState,
+                            evseProtocol : this.state.evseProtocol,
+                            evseDeviceState : this.state.evseDeviceState,
+                            timeoutFound : this.state.timeoutFound
+                        })
+                    }catch (e) {
+                        return false;
                     }
-
-                    let retObj = this.ExtractDeviceStatus(sCommand)
-                    console.log("EXTRACTED PEV DEVICE STATE ",retObj.deviceState)
-                    if (isNaN(retObj.deviceState))
-                    {
-                        retObj.deviceState = this.state.pevDeviceState
+                }
+                for(let i=0;i<this.pevStrings.length;i++){
+                    if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
+                        this.pevStrings[i].found = true
+                        nowFound = true
+                        if(i === 13)//Event | Set | t7
+                        {
+                            if(this.state.continuousTest === true)
+                            {
+                                this.setTimedoutStartCommand(5)
+                            }
+                        }
+                        break;
                     }
+                }
 
+                if(nowFound === true){
+                    console.warn("OKKKKKKKK")
+                    let percCalc = this.state.percentage + ((1 / 14) * 100)
+                    if(percCalc >= 90)
+                        percCalc = 100;
+                    
+                    percCalc = Math.round(percCalc)
 
                     this.setState({  
                         printOutCom : this.printOutCom,
                         toggleToRefresh : !this.state.toggleToRefresh,
-                        role : this.state.role  ,
-                        percentage : this.state.percentage,
-                        started : this.state.started,
+                        role : this.role  ,
+                        percentage : percCalc,
+                        started : true,
                         continuousTest : this.state.continuousTest,
-                        pevProtocol : foundProtocol,
-                        pevDeviceState : retObj.deviceState,
-                        pevHpgState : this.state.hpgState,
+                        pevProtocol : this.state.pevProtocol,
+                        pevDeviceState : this.state.pevDeviceState,
                         evseProtocol : this.state.evseProtocol,
                         evseDeviceState : this.state.evseDeviceState,
-                        evseHpgState : this.state.evseHpgState,
                         timeoutFound : this.state.timeoutFound
                     })
                 }
-            for(let i=0;i<this.pevStrings.length;i++){
-                if(sCommand.includes(this.pevStrings[i].details) && this.pevStrings[i].found === false){
-                    this.pevStrings[i].found = true
-                    nowFound = true
-                    if(i === 13)//Event | Set | t7
-                    {
-                        if(this.state.continuousTest === true)
-                        {
-                            this.setTimedoutStartCommand(5)
-                        }
-                    }
-                    break;
-                }
-            }
-
-            if(nowFound === true){
-                console.warn("OKKKKKKKK")
-                let percCalc = this.state.percentage + ((1 / 14) * 100)
-                if(percCalc >= 90)
-                    percCalc = 100;
-                
-                percCalc = Math.round(percCalc)
-
-                this.setState({  
-                    printOutCom : this.printOutCom,
-                    toggleToRefresh : !this.state.toggleToRefresh,
-                    role : this.role  ,
-                    percentage : percCalc,
-                    started : true,
-                    continuousTest : this.state.continuousTest,
-                    pevProtocol : this.state.pevProtocol,
-                    pevDeviceState : this.state.pevDeviceState,
-                    pevHpgState : this.state.pevHpgState,
-                    evseProtocol : this.state.evseProtocol,
-                    evseDeviceState : this.state.evseDeviceState,
-                    evseHpgState : this.state.evseHpgState,
-                    timeoutFound : this.state.timeoutFound
-                })
-            }
-        }  
-    }
+            }  
+        }
     }
 
 
@@ -327,10 +304,8 @@ class ChademoPage extends Component{
             continuousTest : false,
             pevProtocol : "",
             pevDeviceState : -1,
-            pevHpgState : -1,
             evseProtocol : "",
             evseDeviceState : -1,
-            evseHpgState : -1,
             timeoutFound : false
           };
 
@@ -360,10 +335,8 @@ class ChademoPage extends Component{
             continuousTest : this.state.continuousTest,
             pevProtocol : this.state.pevProtocol,
             pevDeviceState : this.state.pevDeviceState,
-            pevHpgState : this.state.pevHpgState,
             evseProtocol : this.state.evseProtocol,
             evseDeviceState : this.state.evseDeviceState,
-            evseHpgState : this.state.evseHpgState,
             timeoutFound : this.state.timeoutFound
         })
     }
@@ -460,15 +433,16 @@ class ChademoPage extends Component{
             continuousTest : !this.state.continuousTest,
             pevProtocol : this.state.pevProtocol,
             pevDeviceState : this.state.pevDeviceState,
-            pevHpgState : this.state.pevHpgState,
             evseProtocol : this.state.evseProtocol,
             evseDeviceState : this.state.evseDeviceState,
-            evseHpgState : this.state.evseHpgState,
             timeoutFound : this.state.timeoutFound
         })
     }
 
     render(){
+
+        console.log("Continuos Mode",this.state.continuousTest,"PEV ",this.state.pevProtocol, " --- ",this.state.pevDeviceState," EVSE ",this.state.evseProtocol," --- ",this.state.evseDeviceState,this.state.evseHpgState,"timeoutFound ",this.state.timeoutFound)
+        
         if(this.state.pevProtocol === "Chademo" && this.state.evseProtocol === "Chademo"){
             console.log("DeviceState | PEV ",this.state.pevDeviceState," EVSE ",this.state.evseDeviceState)
             return (
