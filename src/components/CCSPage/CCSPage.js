@@ -64,24 +64,24 @@ class CCSPage extends Component{
     }
     initializePEVStrings(){
         this.pevStrings = [
-            {details : "CM_SLAC_PARAM.REQ sent",display : "CM_SLAC_PARAM.REQ sent",found : false,warning : "false"},
-            {details : "CM_SLAC_PARAM.CNF received",display : "CM_SLAC_PARAM.CNF received",found : false,warning : "false"},
-            {details : "CM_START_ATTEN_CHAR.IND sent",display : "CM_START_ATTEN_CHAR.IND sent",found : false,warning : "false"},
-            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false,warning : "false"},
-            {details : "CM_ATTEN_CHAR.IND received",display : "CM_ATTEN_CHAR.IND received",found : false,warning : "false"},
-            {details : "CM_ATTEN_CHAR.RSP sent",display : "CM_ATTEN_CHAR.RSP sent",found : false,warning : "false"},
-            {details : "CM_SLAC_MATCH.REQ sent",display : "CM_SLAC_MATCH.REQ sent",found : false,warning : "false"},
-            {details : "CM_SLAC_MATCH.CNF received",display : "CM_SLAC_MATCH.CNF received",found : false,warning : "false"},	
-            {details : "Link Measurement:",display : "Link Measurement:",found : false,warning : "false"},	
-            {details : "Sending IPv6.",display : "Sending IPv6.",found : false,warning : "false"},	
-            {details : "IPv6 Message is received",display : "IPv6 Message is received",found : false,warning : "false"},	
-            {details : "TIMEOUT",display : "Timeout Occured",found : false,warning : "red"},	
-            {details : "TIMEOUT FOR CONNECT",display : "Timeout To Reconnect",found : false,warning : "red"},	
-            {details : "Waiting for EVSE to be ready!",display : "Waiting for EVSE to be ready!",found : false,warning : "false"},
-            {details : "wrong protocol for pev",display : "Wrong protocol is detected on PEV side",found : false,warning : "red"},	
-            {details : "wrong protocol for evse",display : "Wrong protocol is detected on EVSE side",found : false,warning : "red"},
-            {details : "System is not completed, Power ON Evse Simulator",display : "System is not completed, Power ON Evse Simulator",found : false,warning : "red"},	
-            {details : "Power On PEV and Restart the Page",display : "Power On PEV and Restart the Page",found : false,warning : "red"},		
+            {details : "CM_SLAC_PARAM.REQ sent",display : "CM_SLAC_PARAM.REQ sent",found : false,warning : "false",blink : false},
+            {details : "CM_SLAC_PARAM.CNF received",display : "CM_SLAC_PARAM.CNF received",found : false,warning : "false",blink : false},
+            {details : "CM_START_ATTEN_CHAR.IND sent",display : "CM_START_ATTEN_CHAR.IND sent",found : false,warning : "false",blink : false},
+            {details : "CM_MNBC_SOUND.IND sent",display : "CM_MNBC_SOUND.IND sent",found : false,warning : "false",blink : false},
+            {details : "CM_ATTEN_CHAR.IND received",display : "CM_ATTEN_CHAR.IND received",found : false,warning : "false",blink : false},
+            {details : "CM_ATTEN_CHAR.RSP sent",display : "CM_ATTEN_CHAR.RSP sent",found : false,warning : "false",blink : false},
+            {details : "CM_SLAC_MATCH.REQ sent",display : "CM_SLAC_MATCH.REQ sent",found : false,warning : "false",blink : false},
+            {details : "CM_SLAC_MATCH.CNF received",display : "CM_SLAC_MATCH.CNF received",found : false,warning : "false",blink : false},	
+            {details : "Link Measurement:",display : "Link Measurement:",found : false,warning : "false",blink : false},	
+            {details : "Sending IPv6.",display : "Sending IPv6.",found : false,warning : "false",blink : false},	
+            {details : "IPv6 Message is received",display : "IPv6 Message is received",found : false,warning : "false",blink : false},	
+            {details : "TIMEOUT",display : "Timeout Occured",found : false,warning : "red",blink : false},	
+            {details : "TIMEOUT FOR CONNECT",display : "Timeout To Reconnect",found : false,warning : "red",blink : false},	
+            {details : "Waiting for EVSE to be ready!",display : "Waiting for EVSE to be ready!",found : false,warning : "false",blink : false},
+            {details : "wrong protocol for pev",display : "Wrong protocol is detected on PEV side",found : false,warning : "red",blink : true},	
+            {details : "wrong protocol for evse",display : "Wrong protocol is detected on EVSE side",found : false,warning : "red",blink : true},
+            {details : "System is not completed, Power ON Evse Simulator",display : "System is not completed, Power ON Evse Simulator",found : false,warning : "red",blink : true},	
+            {details : "Power On PEV and Restart the Page",display : "Power On PEV and Restart the Page",found : false,warning : "red",blink : false},		
         ]
         
         
@@ -619,13 +619,24 @@ class CCSPage extends Component{
                         );
                     }
                     else{
-                        return(
-                            <p key={"detailed_"+index} style={{color:'#c20b0b',
-                                                               textShadow: '0 0 0.4em #c20b0b'
-                                                               }} id='warningTextFeature'>
-                                {value.display}
-                            </p>
-                        );
+                        if(value.blink){
+                            return(
+                                <p key={"detailed_"+index} style={{color:'#c20b0b',
+                                                                   textShadow: '0 0 0.4em #c20b0b'
+                                                                   }} id='warningTextFeature'>
+                                    {value.display}
+                                </p>
+                            );
+                        }else{
+                            return(
+                                <p key={"detailed_"+index} style={{color:'#c20b0b',
+                                                                   textShadow: '0 0 0.4em #c20b0b'
+                                                                   }}>
+                                    {value.display}
+                                </p>
+                            );
+                        }   
+                        
                     }
                 }else{
                     return null;
